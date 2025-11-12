@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>One-For-ALL</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <h1 class="app-title">My Deep Learning Models Interface</h1>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-grid">
+            <!-- Left Panel -->
+            <aside class="left-panel">
+                <!-- Model Selection -->
+                <div class="model-selection">
+                    <div class="dropdown-container">
+                        <button class="model-select-btn" id="modelSelectBtn">
+                            Select One Project 👉
+                        </button>
+                        <div class="dropdown-menu hidden" id="modelDropdown">
+                            <div class="dropdown-item" data-model="Emotion Recognition System">Emotion Recognition System</div>
+                            <div class="dropdown-item" data-model="Weapon Detection System">Weapon Detection System</div>
+                            <div class="dropdown-item" data-model="Plant Disease Prediction">Plant Disease Prediction</div>
+                            <div class="dropdown-item" data-model="Fall Detection System">Fall Detection System</div>
+                            <div class="dropdown-item" data-model="Plant Pesticide Recommendation">Plant Pesticide Recommendation</div>
+                            <div class="dropdown-item" data-model="Movie Recommendation System">Movie Recommendation System</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="input-controls">
+                    <button class="webcam-btn" id="webcamBtn">Web Cam</button>
+                    <button class="device-btn" id="deviceBtn">Choose from Device</button>
+                    <input type="file" id="fileInput" accept="image/*" class="hidden" aria-label="Select image file">
+                    <button id="start-btn" class="green-button">Start</button>
+                    <button id="stop-btn" class="red-button hidden">Stop</button>
+                    
+                </div>
+
+                <!-- Results Display -->
+                <div class="results-panel">
+                    <h3>Results</h3>
+                    <div class="result-content">
+                        <div class="result-label" id="resultLabel">No prediction yet</div>
+                        <div class="accuracy-display">
+                            <span>Accuracy: </span>
+                            <span id="accuracyValue">--</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Center Display Area -->
+            <section class="center-display">
+                <div class="display-container" id="displayContainer">
+                    <div class="placeholder-content" id="placeholderContent">
+                        Screen to display camera feed in live or to Display images
+                    </div>
+                    <video id="videoElement" class="media-element hidden" autoplay muted playsinline webkit-playsinline aria-label="Video feed from camera"></video>
+                    <img id="imageElement" class="media-element hidden" alt="Selected image for analysis">
+                    <canvas id="captureCanvas" class="hidden"></canvas>
+                </div>
+                <div class="display-controls">
+                    <button class="capture-btn hidden" id="captureBtn">Capture Photo</button>
+                    <button class="stop-btn hidden" id="stopBtn">Stop Camera</button>
+                    <button class="clear-btn hidden" id="clearBtn">Clear</button>
+                </div>
+            </section>
+
+            <!-- Right Panel -->
+            <aside class="right-panel">
+                <div class="message-box">
+                    <div class="message-header">
+                        <h3>Message Box</h3>
+                        <button class="clear-log-btn" id="clearLogBtn">Clear</button>
+                    </div>
+                    <div class="message-content" id="messageContent">
+                        <div class="message-item system">
+                            <span class="timestamp">10:31 AM</span>
+                            <span class="message">Portfolio interface initialized. Ready for project selection.</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+# Folder(s) you want to ignore
+
+Data
+
+# Python virtual environment
+venv/
+env/
+.venv/
+.env/
+
+# PyCharm project folder
+.idea/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Secret files ( API keys)
+.env

@@ -1,6 +1,6 @@
 # Folder(s) you want to ignore
 
-Data
+/Users/bharathgoud/PycharmProjects/Shunya-00/Data
 
 # Python virtual environment
 venv/

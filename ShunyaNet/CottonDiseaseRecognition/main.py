@@ -17,14 +17,12 @@ from torch.backends import cudnn
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 # Import using string-based imports to handle numeric prefixes in module names
 import importlib
-ShunyaNet = importlib.import_module("ShunyaNet.ShunyaNetArchitecture").ShunyaNet
+ShunyaNet = importlib.import_module("ShunyaNet.CottonDiseaseRecognition.ShunyaNetArch").ShunyaNet
 GenericImageDataset = importlib.import_module("ShunyaNet.CottonDiseaseRecognition.PreProcessing").GenericImageDataset
 
-# Set device (prefer CUDA, then MPS, else CPU)
+# Set device (prefer CUDA, else CPU)
 if torch.cuda.is_available():
     device = torch.device('cuda')
-elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
-    device = torch.device('mps')
 else:
     device = torch.device('cpu')
 print(f"Using device: {device}")
@@ -57,7 +55,7 @@ class Config:
     weight_decay = 1e-5
     seed = 42
     # Early stopping
-    early_stop_patience = 10
+    early_stop_patience = 15
     early_stop_min_delta = 0.0  # consider as improvement only if val_loss decreases by > min_delta
 
     # Model parameters

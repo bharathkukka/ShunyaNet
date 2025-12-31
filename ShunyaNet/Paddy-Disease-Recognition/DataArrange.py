@@ -1,7 +1,4 @@
 """
-DataArrange.py
-Script to count and organize information about the Paddy Disease dataset
-
 IMPORTANT NOTE ABOUT TEST DATA:
 ================================
 The test folder contains unlabeled images (Kaggle competition format).

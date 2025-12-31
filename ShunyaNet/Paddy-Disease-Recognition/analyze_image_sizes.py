@@ -1,7 +1,4 @@
-"""
-analyze_image_sizes.py
-Script to analyze image sizes in train and validation datasets
-"""
+
 
 import os
 from pathlib import Path

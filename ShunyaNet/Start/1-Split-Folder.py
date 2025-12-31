@@ -2,8 +2,8 @@ import splitfolders
 import os
 
 # Set your actual input and output folder paths here
-input_folder = "/Users/bharathgoud/PycharmProjects/Shunya-00/Data/CottonDiseases"
-output_folder = "/Users/bharathgoud/PycharmProjects/Shunya-00/Data/CottonDisease"
+input_folder = "/Users/bharathgoud/PycharmProjects/Shunya-00/Data/train_images"
+output_folder = "/Users/bharathgoud/PycharmProjects/Shunya-00/Data/PaddyDisease"
 
 # Check if input folder exists
 if not os.path.exists(input_folder):

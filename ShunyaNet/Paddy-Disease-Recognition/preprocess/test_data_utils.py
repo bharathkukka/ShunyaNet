@@ -1,13 +1,3 @@
-"""
-test_data_utils.py
-Utility functions for handling unlabeled test data in Kaggle competition format
-
-This module provides tools to:
-1. Load unlabeled test images for prediction
-2. Generate submission files in the correct format
-3. Handle the mismatch between labeled train/val and unlabeled test data
-"""
-
 import os
 import pandas as pd
 from pathlib import Path
@@ -20,8 +10,6 @@ from PIL import Image
 class UnlabeledTestDataset(Dataset):
     """
     PyTorch Dataset for unlabeled test images
-
-    Use this for making predictions on the test set.
     Since test images have no labels, this dataset only returns images and their IDs.
     """
 

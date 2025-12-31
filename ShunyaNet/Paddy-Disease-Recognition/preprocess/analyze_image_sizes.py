@@ -288,27 +288,6 @@ def print_recommendations(train_stats, val_stats):
         else:
             print("   → Recommend: 384x384 or 512x512")
 
-    print("\n" + "-" * 70)
-    print("SAMPLE TRANSFORM CODE:")
-    print("-" * 70)
-    print("""
-from torchvision import transforms
-
-train_transform = transforms.Compose([
-    transforms.Resize((224, 224)),          # Resize to fixed size
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
-
-val_transform = transforms.Compose([
-    transforms.Resize((224, 224)),          # Same size as train
-    transforms.ToTensor(),
-    transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-])
-    """)
-    print("=" * 70)
 
 
 if __name__ == "__main__":

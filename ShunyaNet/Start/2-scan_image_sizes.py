@@ -1,12 +1,11 @@
 import os
 from PIL import Image
 
-# Set the root directory for your dataset
-DATASET_ROOT = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/PaddyDiseases/Dataset'
-SPLITS = ['train', 'val']
+DATASET_ROOT = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/CottonDisease'
+SPLITS = ['train', 'val', 'test']
 
-# All common image extensions
-IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.tif', '.webp', '.JPG', '.JPEG', '.PNG'}
+IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.tif', '.webp',
+                   '.JPG', '.JPEG', '.PNG'}
 
 sizes = {}
 total_images = 0
@@ -15,7 +14,7 @@ error_count = 0
 for split in SPLITS:
     split_dir = os.path.join(DATASET_ROOT, split)
     if not os.path.exists(split_dir):
-        print(f'Warning: {split_dir} does not exist, skipping...')
+        print(f'Warning: {split_dir} not found, skipping...')
         continue
 
     for class_name in os.listdir(split_dir):
@@ -24,8 +23,8 @@ for split in SPLITS:
             continue
 
         for fname in os.listdir(class_dir):
-            # Check if file has a valid image extension
-            if any(fname.endswith(ext) for ext in IMAGE_EXTENSIONS):
+            ext = os.path.splitext(fname)[1]
+            if ext in IMAGE_EXTENSIONS:
                 fpath = os.path.join(class_dir, fname)
                 try:
                     with Image.open(fpath) as img:
@@ -36,19 +35,19 @@ for split in SPLITS:
                     print(f'Error reading {fpath}: {e}')
                     error_count += 1
 
-print('=' * 70)
+print('=' * 60)
 print('IMAGE SIZE DISTRIBUTION REPORT')
-print('=' * 70)
+print('=' * 60)
 print(f'\nTotal images scanned: {total_images}')
-print(f'Unique sizes found: {len(sizes)}')
+print(f'Unique resolutions found: {len(sizes)}')
 if error_count > 0:
-    print(f'Errors encountered: {error_count}')
-print('\nSize distribution (sorted by frequency):')
-print('-' * 70)
+    print(f'Corrupted/Unreadable images: {error_count}')
 
-for size, count in sorted(sizes.items(), key=lambda x: -x[1]):
-    percentage = (count / total_images) * 100 if total_images > 0 else 0
-    print(f'  {size[0]:>4}x{size[1]:<4} : {count:>6} images ({percentage:>5.1f}%)')
+print('\nResolution distribution (sorted by count):')
+print('-' * 60)
 
-print('=' * 70)
+for (w, h), count in sorted(sizes.items(), key=lambda x: -x[1]):
+    percent = (count / total_images) * 100 if total_images else 0
+    print(f'{w:>4}x{h:<4} : {count:>5} images ({percent:>5.1f}%)')
 
+print('=' * 60)

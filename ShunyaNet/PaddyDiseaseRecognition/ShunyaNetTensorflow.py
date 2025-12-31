@@ -1,12 +1,18 @@
+"""
+TensorFlow implementation of ShunyaNet architecture.
+Converted from PyTorch original implementation.
+"""
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-import numpy as np
+
 
 # Swish Activation
 class Swish(layers.Layer):
+    """Custom Swish activation function: x * sigmoid(x)"""
     def call(self, x):
         return x * tf.nn.sigmoid(x)
+
 
 # DropBlock Regularization
 class DropBlock2D(layers.Layer):
@@ -19,20 +25,31 @@ class DropBlock2D(layers.Layer):
     def call(self, x, training=None):
         if not training or self.drop_prob == 0.:
             return x
+
         gamma = self.drop_prob / (self.block_size ** 2)
         batch_size = tf.shape(x)[0]
         height = tf.shape(x)[1]
         width = tf.shape(x)[2]
 
-        mask = tf.cast(tf.random.uniform([batch_size, height, width, 1]) < gamma, tf.float32)
+        # Create random mask
+        mask = tf.cast(
+            tf.random.uniform([batch_size, 1, height, width]) < gamma,
+            tf.float32
+        )
 
         # Apply max pooling to create blocks
-        block_mask = tf.nn.max_pool2d(mask, ksize=self.block_size, strides=1, padding='SAME')
+        block_mask = tf.nn.max_pool2d(
+            mask,
+            ksize=self.block_size,
+            strides=1,
+            padding='SAME'
+        )
 
         out = x * (1 - block_mask)
         scale = tf.cast(tf.size(block_mask), tf.float32) / (tf.reduce_sum(block_mask) + 1e-6)
         out = out * scale
         return out
+
 
 # Inception Block
 class InceptionBlock(layers.Layer):
@@ -63,6 +80,7 @@ class InceptionBlock(layers.Layer):
 
         return tf.concat([branch1, branch2, branch3, branch4], axis=-1)
 
+
 # Squeeze-and-Excitation Block
 class SEBlock(layers.Layer):
     def __init__(self, in_channels, reduction=16):
@@ -74,13 +92,16 @@ class SEBlock(layers.Layer):
     def call(self, x):
         # Global average pooling
         se = self.pool(x)
-        # Squeeze spatial dimensions and apply FC layers
-        se = tf.squeeze(se, axis=[1, 2]) if len(se.shape) == 4 else se
+        # Flatten spatial dimensions
+        batch_size = tf.shape(se)[0]
+        se = tf.reshape(se, [batch_size, -1])
+        # Apply FC layers
         se = self.fc1(se)
         se = self.fc2(se)
-        # Reshape and multiply with input
-        se = tf.reshape(se, [-1, 1, 1, tf.shape(se)[-1]])
+        # Reshape to match channel dimension
+        se = tf.reshape(se, [batch_size, 1, 1, -1])
         return x * se
+
 
 # Residual Dense Block
 class ResidualDenseBlock(layers.Layer):
@@ -92,9 +113,12 @@ class ResidualDenseBlock(layers.Layer):
 
     def call(self, x):
         x1 = tf.nn.relu(self.conv1(x))
-        x2 = tf.nn.relu(self.conv2(tf.concat([x, x1], axis=-1)))
-        x3 = self.conv3(tf.concat([x, x1, x2], axis=-1))
+        x_concat = tf.concat([x, x1], axis=-1)
+        x2 = tf.nn.relu(self.conv2(x_concat))
+        x_concat = tf.concat([x, x1, x2], axis=-1)
+        x3 = self.conv3(x_concat)
         return x + x3
+
 
 # MBConv Block
 class MBConv(layers.Layer):
@@ -102,13 +126,14 @@ class MBConv(layers.Layer):
         super().__init__()
         if activation is None:
             activation = Swish()
+
         hidden_dim = in_channels * expansion_factor
 
         self.conv1 = layers.Conv2D(hidden_dim, kernel_size=1, padding='same')
         self.bn1 = layers.BatchNormalization()
         self.activation1 = activation
 
-        self.conv2 = layers.Conv2D(hidden_dim, kernel_size=3, padding='same', groups=hidden_dim)
+        self.conv2 = layers.DepthwiseConv2D(kernel_size=3, padding='same')
         self.bn2 = layers.BatchNormalization()
         self.activation2 = activation
 
@@ -132,12 +157,14 @@ class MBConv(layers.Layer):
         out = self.se(out)
         return out + x
 
+
 # Ghost Module
 class GhostModule(layers.Layer):
     def __init__(self, in_channels, out_channels, activation=None, ratio=2):
         super().__init__()
         if activation is None:
             activation = Swish()
+
         init_channels = out_channels // ratio
         new_channels = out_channels - init_channels
 
@@ -148,15 +175,20 @@ class GhostModule(layers.Layer):
         ])
 
         self.cheap_operation = keras.Sequential([
-            layers.Conv2D(new_channels, kernel_size=3, padding='same', groups=init_channels, use_bias=False),
+            layers.DepthwiseConv2D(kernel_size=3, padding='same', use_bias=False),
             layers.BatchNormalization(),
             activation
         ])
+        self.out_channels = out_channels
+        self.init_channels = init_channels
 
     def call(self, x):
         primary = self.primary_conv(x)
         cheap = self.cheap_operation(primary)
+        # Only take the first new_channels from cheap operation
+        cheap = cheap[:, :, :, :self.out_channels - self.init_channels]
         return tf.concat([primary, cheap], axis=-1)
+
 
 # Dual Attention Block (CBAM)
 class DualAttention(layers.Layer):
@@ -178,10 +210,13 @@ class DualAttention(layers.Layer):
     def call(self, x):
         ca = self.channel_att(x)
         x = x * ca
+
         avg = tf.reduce_mean(x, axis=1, keepdims=True)
-        max_ = tf.reduce_max(x, axis=1, keepdims=True)
-        sa = self.spatial_att(tf.concat([avg, max_], axis=1))
+        max_val = tf.reduce_max(x, axis=1, keepdims=True)
+
+        sa = self.spatial_att(tf.concat([avg, max_val], axis=1))
         return x * sa
+
 
 # Selective Kernel Convolution
 class SKConv(layers.Layer):
@@ -189,6 +224,7 @@ class SKConv(layers.Layer):
         super().__init__()
         if activation is None:
             activation = Swish()
+
         d = max(in_channels // r, 32)
         self.M = M
         self.in_channels = in_channels
@@ -199,7 +235,7 @@ class SKConv(layers.Layer):
             kernel_size = 3 + 2 * i
             padding = 1 + i
             self.convs.append(keras.Sequential([
-                layers.Conv2D(in_channels, kernel_size=kernel_size, padding=padding, groups=G),
+                layers.Conv2D(in_channels, kernel_size=kernel_size, padding=padding),
                 layers.BatchNormalization(),
                 activation
             ]))
@@ -212,12 +248,19 @@ class SKConv(layers.Layer):
         ])
 
     def call(self, x):
+        batch_size = tf.shape(x)[0]
+        height = tf.shape(x)[1]
+        width = tf.shape(x)[2]
+
         feats = tf.stack([conv(x) for conv in self.convs], axis=1)
+
         attn = self.fc(tf.reduce_sum(feats, axis=1))
-        attn = tf.reshape(attn, [tf.shape(x)[0], self.M, -1, 1, 1])
+        attn = tf.reshape(attn, [batch_size, self.M, -1, 1, 1])
         attn = tf.nn.softmax(attn, axis=1)
+
         out = tf.reduce_sum(feats * attn, axis=1)
         return out
+
 
 # ReZero Residual Block
 class ReZeroResidualBlock(layers.Layer):
@@ -225,6 +268,7 @@ class ReZeroResidualBlock(layers.Layer):
         super().__init__()
         if activation is None:
             activation = Swish()
+
         self.conv1 = layers.Conv2D(channels, kernel_size=3, padding='same')
         self.bn1 = layers.BatchNormalization()
         self.activation = activation
@@ -240,6 +284,7 @@ class ReZeroResidualBlock(layers.Layer):
         out = self.bn2(out, training=training)
         return x + self.alpha * out
 
+
 # CSP-Inception Block
 class CSPInception(layers.Layer):
     def __init__(self, in_channels):
@@ -253,18 +298,21 @@ class CSPInception(layers.Layer):
         self.concat_conv = layers.Conv2D(in_channels, kernel_size=1, padding='same')
 
     def call(self, x):
-        x1, x2 = tf.split(x, 2, axis=-1)
+        x1 = x[:, :, :, :self.split]
+        x2 = x[:, :, :, self.split:]
         out = self.inception_path(x1)
         out = tf.concat([x2, out], axis=-1)
         out = self.concat_conv(out)
         return out
 
-# Global Context Block (ConvNeXt/GCNet)
+
+# Global Context Block
 class GlobalContextBlock(layers.Layer):
     def __init__(self, in_channels, activation=None):
         super().__init__()
         if activation is None:
             activation = Swish()
+
         self.in_channels = in_channels
         self.pool = layers.GlobalAveragePooling2D(keepdims=True)
         self.block = keras.Sequential([
@@ -274,12 +322,10 @@ class GlobalContextBlock(layers.Layer):
         ])
 
     def call(self, x):
-        # Global context
         context = self.pool(x)
-        # Transform context
         context = self.block(context)
-        # Apply context back to input
         return x + context
+
 
 # Multi-Head Self-Attention (MHSA)
 class MHSA(layers.Layer):
@@ -291,28 +337,29 @@ class MHSA(layers.Layer):
         self.proj = layers.Conv2D(in_channels, kernel_size=1, padding='same')
 
     def call(self, x):
-        B = tf.shape(x)[0]
-        C = self.in_channels
-        H = tf.shape(x)[1]
-        W = tf.shape(x)[2]
+        batch_size = tf.shape(x)[0]
+        height = tf.shape(x)[1]
+        width = tf.shape(x)[2]
+        channels = self.in_channels
 
         qkv = self.qkv(x)
-        qkv = tf.reshape(qkv, [B, H * W, 3, self.heads, C // self.heads])
+        qkv = tf.reshape(qkv, [batch_size, height * width, 3, self.heads, channels // self.heads])
         qkv = tf.transpose(qkv, [2, 0, 3, 1, 4])
 
         q, k, v = qkv[0], qkv[1], qkv[2]
 
-        scale = tf.cast((C // self.heads) ** 0.5, tf.float32)
+        scale = tf.cast((channels // self.heads) ** 0.5, tf.float32)
         attn = tf.matmul(q, k, transpose_b=True) / scale
         attn = tf.nn.softmax(attn, axis=-1)
 
         out = tf.matmul(attn, v)
         out = tf.transpose(out, [0, 2, 1, 3])
-        out = tf.reshape(out, [B, H, W, C])
+        out = tf.reshape(out, [batch_size, height, width, channels])
         out = self.proj(out)
         return out + x
 
-# Attention Pooling (for classifier head)
+
+# Attention Pooling
 class AttentionPooling(layers.Layer):
     def __init__(self, in_channels, num_classes):
         super().__init__()
@@ -320,17 +367,18 @@ class AttentionPooling(layers.Layer):
         self.fc = layers.Dense(num_classes)
 
     def call(self, x):
-        B = tf.shape(x)[0]
-        H = tf.shape(x)[1]
-        W = tf.shape(x)[2]
+        batch_size = tf.shape(x)[0]
+        height = tf.shape(x)[1]
+        width = tf.shape(x)[2]
 
         w = self.attn(x)
-        w = tf.reshape(w, [B, -1])
+        w = tf.reshape(w, [batch_size, -1])
         w = tf.nn.softmax(w, axis=1)
-        w = tf.reshape(w, [B, 1, H, W])
+        w = tf.reshape(w, [batch_size, height, width, 1])
 
         x = tf.reduce_sum(x * w, axis=[1, 2])
         return self.fc(x)
+
 
 # ShunyaNet: Combined Architecture
 class ShunyaNet(keras.Model):
@@ -340,7 +388,7 @@ class ShunyaNet(keras.Model):
             activation = Swish()
 
         self.stem = keras.Sequential([
-            layers.Conv2D(64, kernel_size=3, stride=2, padding=1),
+            layers.Conv2D(64, kernel_size=3, strides=2, padding='same'),
             layers.BatchNormalization(),
             activation
         ])
@@ -365,11 +413,10 @@ class ShunyaNet(keras.Model):
         ])
 
         self.attn_pool = AttentionPooling(128, num_classes)
-
         self.num_classes = num_classes
 
     def call(self, x, training=None):
-        x = self.stem(x, training=training)
+        x = self.stem(x)
         x = self.inception(x)
         x = self.se(x)
         x = self.res_dense(x)
@@ -390,3 +437,4 @@ class ShunyaNet(keras.Model):
 
         # Ensemble output
         return (out1 + out2) / 2
+

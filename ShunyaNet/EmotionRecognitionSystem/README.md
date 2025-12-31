@@ -243,7 +243,3 @@ Model-level tweaks (in `ShunyaNetArchitecture.py`):
 - Plotting issues in headless environments: The script writes plots to files; no display backend is required.
 
 ---
-
-## License and attribution
-This repository contains a custom CNN architecture (ShunyaNet) and training pipeline authored by the project owner. External libraries used are listed in `requirements.txt` and are subject to their respective licenses.
-

@@ -1,8 +1,6 @@
-
 import os
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
 import matplotlib.pyplot as plt
 from sklearn.metrics import confusion_matrix, classification_report
 import seaborn as sns
@@ -12,8 +10,8 @@ import numpy as np
 import csv
 from tqdm import tqdm
 
-# Add the parent directory to sys.path to import modules
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+# Add the project root to sys.path so the top-level `ShunyaNet` package is importable
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 
 # # Import the ShunyaNet architecture and preprocessing
 # from Paddy_Disease_Recognition.ShunyaNetTensorflow import ShunyaNet
@@ -44,13 +42,13 @@ def set_seed(seed: int = 42):
 # Configuration
 class Config:
     # Dataset parameters
-    data_dir = 'Data/PaddyDisease'
+    data_dir = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/PaddyDisease'
     target_size = (224, 224)
 
     # Training parameters
     num_classes = 10  # default/reference; model will derive from dataset at runtime
     batch_size = 32
-    num_epochs = 35
+    num_epochs = 1
     learning_rate = 0.001
     weight_decay = 1e-5
     seed = 42
@@ -237,7 +235,7 @@ def train(model, train_loader, val_loader, loss_fn, optimizer, num_epochs, class
 
         current_lr = optimizer.learning_rate
         if isinstance(current_lr, tf.Variable):
-            current_lr = float(current_lr.numpy())
+            current_lr = float(current_lr.value)  # type: ignore
         else:
             current_lr = float(current_lr)
         history['lr'].append(current_lr)
@@ -457,4 +455,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

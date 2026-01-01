@@ -5,7 +5,6 @@ Converted from PyTorch torchvision implementation.
 import os
 import tensorflow as tf
 from tensorflow.image import random_brightness, random_contrast, random_saturation
-import numpy as np
 
 
 class GenericImageDataset:
@@ -26,7 +25,8 @@ class GenericImageDataset:
         self.samples = []
 
         # Accept common image extensions (case-insensitive)
-        valid_exts = ('.jpg', '.jpeg', '.png', '.bmp', '.webp')
+        valid_exts = ('.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.tif', '.webp',
+                   '.JPG', '.JPEG', '.PNG')
 
         for label, class_name in enumerate(self.classes):
             class_dir = os.path.join(self.root_dir, class_name)
@@ -98,9 +98,9 @@ class GenericImageDataset:
         image = image / 255.0
 
         # ImageNet normalization
-        mean = tf.constant([0.485, 0.456, 0.406])
-        std = tf.constant([0.229, 0.224, 0.225])
-        image = (image - mean) / std
+        mean = tf.constant([0.485, 0.456, 0.406], dtype=tf.float32)
+        std = tf.constant([0.229, 0.224, 0.225], dtype=tf.float32)
+        image = (image - mean) / std  # type: ignore
 
         return image, label
 

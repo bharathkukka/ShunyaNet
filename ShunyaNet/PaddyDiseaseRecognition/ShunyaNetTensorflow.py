@@ -45,6 +45,9 @@ class DropBlock2D(layers.Layer):
             padding='SAME'
         )
 
+        # Convert to channel-last shape [batch, H, W, 1] so it broadcasts with x [batch, H, W, C]
+        block_mask = tf.transpose(block_mask, [0, 2, 3, 1])
+
         out = x * (1 - block_mask)
         scale = tf.cast(tf.size(block_mask), tf.float32) / (tf.reduce_sum(block_mask) + 1e-6)
         out = out * scale
@@ -211,10 +214,12 @@ class DualAttention(layers.Layer):
         ca = self.channel_att(x)
         x = x * ca
 
-        avg = tf.reduce_mean(x, axis=1, keepdims=True)
-        max_val = tf.reduce_max(x, axis=1, keepdims=True)
+        # Compute spatial attention by reducing over the channel dimension
+        avg = tf.reduce_mean(x, axis=-1, keepdims=True)  # shape: [batch, H, W, 1]
+        max_val = tf.reduce_max(x, axis=-1, keepdims=True)  # shape: [batch, H, W, 1]
 
-        sa = self.spatial_att(tf.concat([avg, max_val], axis=1))
+        # Concatenate along the channel axis to create a 2-channel spatial map
+        sa = self.spatial_att(tf.concat([avg, max_val], axis=-1))  # outputs [batch, H, W, 1]
         return x * sa
 
 
@@ -232,10 +237,10 @@ class SKConv(layers.Layer):
 
         self.convs = []
         for i in range(M):
+            # Use odd kernel sizes 3,5,... and 'same' padding for TensorFlow/Keras
             kernel_size = 3 + 2 * i
-            padding = 1 + i
             self.convs.append(keras.Sequential([
-                layers.Conv2D(in_channels, kernel_size=kernel_size, padding=padding),
+                layers.Conv2D(in_channels, kernel_size=kernel_size, padding='same'),
                 layers.BatchNormalization(),
                 activation
             ]))
@@ -255,7 +260,8 @@ class SKConv(layers.Layer):
         feats = tf.stack([conv(x) for conv in self.convs], axis=1)
 
         attn = self.fc(tf.reduce_sum(feats, axis=1))
-        attn = tf.reshape(attn, [batch_size, self.M, -1, 1, 1])
+        # Reshape attention to [batch, M, 1, 1, channels] so it broadcasts with feats [batch, M, H, W, channels]
+        attn = tf.reshape(attn, [batch_size, self.M, 1, 1, self.in_channels])
         attn = tf.nn.softmax(attn, axis=1)
 
         out = tf.reduce_sum(feats * attn, axis=1)
@@ -282,7 +288,7 @@ class ReZeroResidualBlock(layers.Layer):
         out = self.activation(out)
         out = self.conv2(out)
         out = self.bn2(out, training=training)
-        return x + self.alpha * out
+        return x + tf.cast(self.alpha, out.dtype) * out
 
 
 # CSP-Inception Block
@@ -437,4 +443,3 @@ class ShunyaNet(keras.Model):
 
         # Ensemble output
         return (out1 + out2) / 2
-

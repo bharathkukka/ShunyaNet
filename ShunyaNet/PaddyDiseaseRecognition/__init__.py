@@ -1,0 +1,4 @@
+"""
+PaddyDiseaseRecognition module for ShunyaNet.
+"""
+

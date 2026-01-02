@@ -52,7 +52,7 @@ class Config:
     # Training parameters
     num_classes = 8  # default/reference; model will derive from dataset at runtime
     batch_size = 16
-    num_epochs = 30
+    num_epochs = 34
     learning_rate = 0.001
     weight_decay = 1e-5
     seed = 42

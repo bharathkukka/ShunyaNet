@@ -10,7 +10,7 @@ from tensorflow.image import random_brightness, random_contrast, random_saturati
 class GenericImageDataset:
     """TensorFlow-based generic image dataset loader with augmentation support."""
 
-    def __init__(self, root_dir, split='train', target_size=(224, 224), augment=False):
+    def __init__(self, root_dir, split='train', target_size=(128, 128), augment=False):
         self.root_dir = os.path.join(root_dir, split)
         self.target_size = target_size
         self.augment = augment

@@ -48,9 +48,9 @@ class Config:
     target_size = (224, 224)
 
     # Training parameters
-    num_classes = 4 # default/reference; model will derive from dataset at runtime
-    batch_size = 32
-    num_epochs = 40
+    num_classes = 4
+    batch_size = 16
+    num_epochs = 34
     learning_rate = 0.001
     weight_decay = 1e-5
     seed = 42

@@ -19,6 +19,9 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '.
 import importlib
 ShunyaNet = importlib.import_module("ShunyaNet.PaddyDiseaseRecognition.ShunyaNetTensorflow").ShunyaNet
 GenericImageDataset = importlib.import_module("ShunyaNet.PaddyDiseaseRecognition.preprocessing").GenericImageDataset
+
+# Import custom layers for model loading
+from ShunyaNet.PaddyDiseaseRecognition.ShunyaNetTensorflow import Swish, DropBlock2D
 # Set GPU memory growth to avoid OOM errors
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
@@ -69,11 +72,22 @@ class Config:
     _base_dir = os.path.dirname(__file__)
     checkpoint_dir = os.path.join(_base_dir, 'output', 'checkpoints')
     results_dir = os.path.join(_base_dir, 'output', 'results')
+    model_extension = '.keras'  # Use .keras format (Keras 3 native format)
 
 
 # Create directories for checkpoints and results
 os.makedirs(Config.checkpoint_dir, exist_ok=True)
 os.makedirs(Config.results_dir, exist_ok=True)
+
+
+# Helper function to get custom objects for loading models
+def get_custom_objects():
+    """Return custom objects dict for model loading."""
+    return {
+        'Swish': Swish,
+        'DropBlock2D': DropBlock2D,
+        'ShunyaNet': ShunyaNet
+    }
 
 
 # Load datasets
@@ -260,7 +274,8 @@ def train(model, train_loader, val_loader, loss_fn, optimizer, num_epochs, class
         # Save best model (based on val_acc)
         if epoch_val_acc > best_val_acc:
             best_val_acc = epoch_val_acc
-            model.save(best_model_path)
+            best_model_path_with_ext = best_model_path + Config.model_extension
+            model.save(best_model_path_with_ext)
             print(f"New best model saved with validation accuracy: {best_val_acc:.4f}")
 
             # Generate and save confusion matrix for best model
@@ -277,7 +292,7 @@ def train(model, train_loader, val_loader, loss_fn, optimizer, num_epochs, class
 
         # Save checkpoint every 5 epochs
         if (epoch + 1) % 5 == 0:
-            checkpoint_path = os.path.join(Config.checkpoint_dir, f'checkpoint_epoch_{epoch+1}')
+            checkpoint_path = os.path.join(Config.checkpoint_dir, f'checkpoint_epoch_{epoch+1}{Config.model_extension}')
             model.save(checkpoint_path)
             print(f"Checkpoint saved at epoch {epoch+1}")
 
@@ -438,8 +453,8 @@ def main():
     )
 
     # Load best model for evaluation
-    best_model_path = os.path.join(Config.checkpoint_dir, 'best_model')
-    model = keras.models.load_model(best_model_path)
+    best_model_path = os.path.join(Config.checkpoint_dir, 'best_model' + Config.model_extension)
+    model = keras.models.load_model(best_model_path, custom_objects=get_custom_objects())
     print(f"\nLoaded best model with validation accuracy: {best_val_acc:.4f}")
 
     # Evaluate on test set

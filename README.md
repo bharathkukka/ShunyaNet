@@ -65,5 +65,3 @@ The architecture was first implemented and trained in PyTorch for emotion and co
 ---
 ### Final Outcome
 ShunyaNet achieved strong, generalizable performance across all three tasks, validating the effectiveness of combining advanced blocks from multiple architectures. The project serves as a blueprint for building robust, portable, and high-performing CNN backbones for diverse computer vision challenges.
-  
-| Component / Parameter         | [Emotion Recognition](`EmotionRecognitonSystem/`)                            | Cotton Disease Recognition                     | Paddy Disease Recognition                      |

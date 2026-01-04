@@ -46,12 +46,12 @@ def set_seed(seed: int = 42):
 class Config:
     # Dataset parameters
     data_dir = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/PaddyDisease'
-    target_size = (128, 128)
+    target_size = (224, 224)
 
     # Training parameters
     num_classes = 10  # default/reference; model will derive from dataset at runtime
-    batch_size = 8
-    num_epochs = 30
+    batch_size = 2
+    num_epochs = 42
     learning_rate = 0.001
     weight_decay = 1e-5
     seed = 42

@@ -37,28 +37,28 @@ The architecture was first implemented and trained in PyTorch for emotion and co
 
 ## Training Details
 
-| Component / Parameter         | Emotion Recognition                            | Cotton Disease Recognition                     | Paddy Disease Recognition                      |
-|------------------------------|------------------------------------------------|------------------------------------------------|------------------------------------------------|
-| **PC Specifications**        | Intel i7-10750H 12th Gen, 16GB RAM, Windows 11 | Intel i7-10750H 12th Gen, 16GB RAM, Windows 11 | Intel i7-10750H 12th Gen, 16GB RAM, Windows 11 |
-| **Python Version**           | Python 3.14.x                                  | Python 3.14.x                                  | Python 3.11.x                                  |
-| **Framework**                | PyTorch 1.13                                   | PyTorch 1.13                                   | TensorFlow 2.10 (Keras)                        |
-| **Batch Size**               | 16                                             | 16                                             | 2                                              |
-| **Epochs**                   | 52                                             | 42                                             | 42                                             |
-| **Iterations per Epoch**     | 23229/16 = ~1452                               | 1366/16 = ~86                                  | 8323/2 = ~ 4162                                |
-| **Train Images**             | 23229                                          | 1365                                           | 8323                                           |
-| **Validation Images**        | 2900                                           | 168                                            | 1036                                           |
-| **Test Images**              | 2913                                           | 176                                            | 1048                                           |
-| **Number of Classes**        | 8                                              | 4                                              | 10                                             |
-| **Loss Function**            | CrossEntropyLoss                               | CrossEntropyLoss                               | SparseCategoricalCrossentropy                  |
-| **Optimizer**                | AdamW                                          | AdamW                                          | AdamW                                          |
-| **Learning Rate**            | 0.001 (cosine annealing)                       | 0.001 (cosine annealing)                       | 0.001 (ReduceLROnPlateau)                      |
-| **Data Augmentation**        | Flip, Crop, Color Jitter                       | Crop, Flip, Rotation, Color Jitter, Blur       | Flip, Rotation, Zoom, Brightness/Contrast      |
-| **Regularization**           | DropBlock2D, Weight Decay (1e-5)               | DropBlock2D, Weight Decay (1e-5)               | Dropout (0.3), Weight Decay (1e-5)             |
-| **Input Image Size**         | 96x96                                          | 224x224                                        | 224x224                                        |
-| **Early Stopping**           | Yes                            | Yes                             | Yes                            |
-| **Model Checkpointing**      | Best val accuracy, checkpoints every 5 epochs  | Best val accuracy, checkpoints every 5 epochs  | Best val accuracy, checkpoints every 5 epochs  |
-| **Transfer Learning**        | No                                             | No                                             | No                                             |
-| **Total Training Time**      | 20                                             | 30                                             | 34                                             |
+| Component / Parameter         | [Emotion Recognition](ShunyaNet/EmotionRecognitionSystem)                            | [Cotton Disease Recognition ](ShunyaNet/CottonDiseaseRecognition) | [Paddy Disease Recognition](ShunyaNet/PaddyDiseaseRecognition) |
+|------------------------------|----------------------------------------|-------------------------------------------------------------------|----------------------------------------------------------------|
+| **PC Specifications**        | Intel i7-10750H 12th Gen, 16GB RAM, Windows 11 | Intel i7-10750H 12th Gen, 16GB RAM, Windows 11                    | Intel i7-10750H 12th Gen, 16GB RAM, Windows 11                 |
+| **Python Version**           | Python 3.14.x                          | Python 3.14.x                                                     | Python 3.11.x                                                  |
+| **Framework**                | PyTorch 1.13                           | PyTorch 1.13                                                      | TensorFlow 2.10 (Keras)                                        |
+| **Batch Size**               | 16                                     | 16                                                                | 2                                                              |
+| **Epochs**                   | 52                                     | 42                                                                | 42                                                             |
+| **Iterations per Epoch**     | 23229/16 = ~1452                       | 1366/16 = ~86                                                     | 8323/2 = ~ 4162                                                |
+| **Train Images**             | 23229                                  | 1365                                                              | 8323                                                           |
+| **Validation Images**        | 2900                                   | 168                                                               | 1036                                                           |
+| **Test Images**              | 2913                                   | 176                                                               | 1048                                                           |
+| **Number of Classes**        | 8                                      | 4                                                                 | 10                                                             |
+| **Loss Function**            | CrossEntropyLoss                       | CrossEntropyLoss                                                  | SparseCategoricalCrossentropy                                  |
+| **Optimizer**                | AdamW                                  | AdamW                                                             | AdamW                                                          |
+| **Learning Rate**            | 0.001 (cosine annealing)               | 0.001 (cosine annealing)                                          | 0.001 (ReduceLROnPlateau)                                      |
+| **Data Augmentation**        | Flip, Crop, Color Jitter               | Crop, Flip, Rotation, Color Jitter, Blur                          | Flip, Rotation, Zoom, Brightness/Contrast                      |
+| **Regularization**           | DropBlock2D, Weight Decay (1e-5)       | DropBlock2D, Weight Decay (1e-5)                                  | Dropout (0.3), Weight Decay (1e-5)                             |
+| **Input Image Size**         | 96x96                                  | 224x224                                                           | 224x224                                                        |
+| **Early Stopping**           | Yes                         | Yes                                                               | Yes                                                            |
+| **Model Checkpointing**      | Best val accuracy, checkpoints every 5 epochs | Best val accuracy, checkpoints every 5 epochs                     | Best val accuracy, checkpoints every 5 epochs                  |
+| **Transfer Learning**        | No                                     | No                                                                | No                                                             |
+| **Total Training Time**      | 20                                     | 30                                                                | 34                                                             |
 
 
 
@@ -66,3 +66,4 @@ The architecture was first implemented and trained in PyTorch for emotion and co
 ### Final Outcome
 ShunyaNet achieved strong, generalizable performance across all three tasks, validating the effectiveness of combining advanced blocks from multiple architectures. The project serves as a blueprint for building robust, portable, and high-performing CNN backbones for diverse computer vision challenges.
   
+| Component / Parameter         | [Emotion Recognition](`EmotionRecognitonSystem/`)                            | Cotton Disease Recognition                     | Paddy Disease Recognition                      |

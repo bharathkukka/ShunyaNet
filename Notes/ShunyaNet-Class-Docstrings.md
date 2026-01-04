@@ -157,14 +157,13 @@ AttentionPooling aggregates features by assigning importance weights to differen
 
 ---
 
-## 🥇 BestCNN (Hybrid Architecture)
+## 🥇 ShunyaNet (Hybrid Architecture)
 **Explanation:**
-BestCNN is a hybrid architecture that integrates multiple advanced blocks, including Swish, DropBlock2D, Inception, SEBlock, and more. By combining the strengths of these components, BestCNN achieves robust and flexible image classification performance. It leverages state-of-the-art ideas from EfficientNet, ResNet, DenseNet, Inception, GhostNet, SKNet, CBAM, CSPNet, ReZero, ConvNeXt, and ViT. The architecture is designed for versatility, scalability, and top-tier accuracy in diverse computer vision tasks.
+ShunyaNet is a hybrid architecture that integrates multiple advanced blocks, including Swish, DropBlock2D, Inception, SEBlock, and more. By combining the strengths of these components, BestCNN achieves robust and flexible image classification performance. It leverages state-of-the-art ideas from EfficientNet, ResNet, DenseNet, Inception, GhostNet, SKNet, CBAM, CSPNet, ReZero, ConvNeXt, and ViT. The architecture is designed for versatility, scalability, and top-tier accuracy in diverse computer vision tasks.
 - **Purpose:** Combines all advanced blocks
 - **Benefits:** 🦸‍♂️ Robust, flexible image classification
 - **Inspired by:** EfficientNet, ResNet, DenseNet, Inception, GhostNet, SKNet, CBAM, CSPNet, ReZero, ConvNeXt, ViT
 - **Used in:** Custom hybrid
 - **How:** Sequential blocks, ensemble classifier heads, leveraging state-of-the-art ideas for best performance.
-
 ---
 

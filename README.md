@@ -1,4 +1,4 @@
-# ShunyaNet 
+# *ShunyaNet* 
 ## Project Overview
 ShunyaNet is a custom-designed convolutional neural network (CNN) backbone that unifies the strongest architectural blocks from leading models such as ResNet, Inception, DenseNet, EfficientNet, and others. The goal is to combine the best ideas from modern deep learning research into a single, flexible, and high-performing architecture.
 

@@ -51,11 +51,11 @@ class Config:
     num_classes = 4
     batch_size = 16
     num_epochs = 42
-    learning_rate = 0.001
+    learning_rate = 0.0005  # Lower initial learning rate
     weight_decay = 1e-5
     seed = 42
     # Early stopping
-    early_stop_patience = 15
+    early_stop_patience = 30  # Increased patience
     early_stop_min_delta = 0.0  # consider as improvement only if val_loss decreases by > min_delta
 
     # Model parameters
@@ -390,6 +390,17 @@ def main():
     # Load Data
     train_loader, val_loader, test_loader, class_names = load_data()
 
+    # Compute class weights for imbalanced classes
+    from collections import Counter
+    import torch
+    train_labels = []
+    for _, labels in train_loader:
+        train_labels.extend(labels.tolist())
+    class_counts = Counter(train_labels)
+    total = sum(class_counts.values())
+    class_weights = [total / (Config.num_classes * class_counts.get(i, 1)) for i in range(Config.num_classes)]
+    class_weights_tensor = torch.tensor(class_weights, dtype=torch.float).to(device)
+
     # Initialize model
     print("Initializing ShunyaNet...")
     num_classes = len(class_names)
@@ -400,7 +411,7 @@ def main():
     ).to(device)
 
     # Loss function and optimizer
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights_tensor)  # Add class weights
     optimizer = optim.AdamW(
         model.parameters(),
         lr=Config.learning_rate,
@@ -412,7 +423,7 @@ def main():
         optimizer,
         mode='min',
         factor=0.5,
-        patience=3
+        patience=5  # More patience for scheduler
     )
 
     # Train the model

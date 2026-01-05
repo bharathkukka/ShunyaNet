@@ -1,0 +1,13 @@
+Test Loss: 1.3626, Test Accuracy: 0.3807
+
+Classification Report:
+                  precision    recall  f1-score   support
+
+bacterial_blight     0.0000    0.0000    0.0000        46
+      curl_virus     0.2921    0.6047    0.3939        43
+  fussarium_wilt     0.5362    0.8605    0.6607        43
+         healthy     0.2353    0.0909    0.1311        44
+
+        accuracy                         0.3807       176
+       macro avg     0.2659    0.3890    0.2965       176
+    weighted avg     0.2612    0.3807    0.2905       176

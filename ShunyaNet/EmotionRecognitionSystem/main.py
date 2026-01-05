@@ -12,6 +12,7 @@ import sys
 import random
 import numpy as np
 from torch.backends import cudnn
+from torchvision import transforms
 
 # Add the parent directory to sys.path to import modules
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -53,11 +54,11 @@ class Config:
     num_classes = 8  # default/reference; model will derive from dataset at runtime
     batch_size = 16
     num_epochs = 52
-    learning_rate = 0.001
+    learning_rate = 0.0005  # Lower initial learning rate
     weight_decay = 1e-5
     seed = 42
     # Early stopping
-    early_stop_patience = 12
+    early_stop_patience = 45  # Increased patience
     early_stop_min_delta = 0.0  # consider as improvement only if val_loss decreases by > min_delta
 
     # Model parameters
@@ -73,6 +74,14 @@ class Config:
 os.makedirs(Config.checkpoint_dir, exist_ok=True)
 os.makedirs(Config.results_dir, exist_ok=True)
 
+# 1. Data augmentation for training set
+train_transform = transforms.Compose([
+    transforms.RandomHorizontalFlip(),
+    transforms.RandomRotation(10),
+    transforms.ToTensor()
+])
+val_transform = transforms.ToTensor()
+
 # Load datasets
 def load_data():
     print("Loading datasets...")
@@ -80,14 +89,16 @@ def load_data():
         Config.data_dir,
         split='train',
         target_size=Config.target_size,
-        augment=True
+        augment=True,
+        transform=train_transform  # Add data augmentation
     )
 
     val_dataset = GenericImageDataset(
         Config.data_dir,
         split='val',
         target_size=Config.target_size,
-        augment=False
+        augment=False,
+        transform=val_transform
     )
 
     test_dataset = GenericImageDataset(
@@ -135,6 +146,32 @@ def load_data():
     print(f"Classes: {class_names}")
 
     return train_loader, val_loader, test_loader, class_names
+
+# 2. Compute class weights (example, replace with actual calculation)
+# import torch
+# import numpy as np
+# Suppose 'train_labels' is a list or numpy array of all training labels
+# class_sample_count = np.array([len(np.where(train_labels == t)[0]) for t in np.unique(train_labels)])
+# weight = 1. / class_sample_count
+# samples_weight = np.array([weight[t] for t in train_labels])
+# class_weights = torch.tensor(weight, dtype=torch.float).to(device)
+# For now, use placeholder:
+class_weights = torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], dtype=torch.float).to(device)
+
+# Model definition (increase complexity)
+class ImprovedModel(nn.Module):
+    def __init__(self, input_dim, num_classes):
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.Linear(input_dim, 512),
+            nn.ReLU(),
+            nn.Dropout(0.5),
+            nn.Linear(512, 256),
+            nn.ReLU(),
+            nn.Linear(256, num_classes)
+        )
+    def forward(self, x):
+        return self.net(x)
 
 # Training function
 def train(model, train_loader, val_loader, criterion, optimizer, scheduler, num_epochs, class_names):
@@ -402,7 +439,7 @@ def main():
     ).to(device)
 
     # Loss function and optimizer
-    criterion = nn.CrossEntropyLoss()
+    criterion = nn.CrossEntropyLoss(weight=class_weights)
     optimizer = optim.AdamW(
         model.parameters(),
         lr=Config.learning_rate,

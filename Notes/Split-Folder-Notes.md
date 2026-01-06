@@ -58,31 +58,6 @@ This script is used to split an image dataset into training, validation, and tes
 
 ---
 
-## Example Output
-```
-Dataset split into train, validation, and test sets.
-
-Total number of images in training set: 8000
-Number of images in training set subfolders:
-  anger: 1000
-  happy: 1000
-  ...
-
-Total number of images in validation set: 1000
-Number of images in validation set subfolders:
-  anger: 125
-  happy: 125
-  ...
-
-Total number of images in test set: 1000
-Number of images in test set subfolders:
-  anger: 125
-  happy: 125
-  ...
-```
-
----
-
 ## Good Practices
 - Always check your input/output paths before running.
 - Use a fixed seed for reproducibility.
@@ -92,8 +67,4 @@ Number of images in test set subfolders:
 
 ## Reference
 - [splitfolders documentation](https://pypi.org/project/split-folders/)
-
----
-
-# End of Notes
 

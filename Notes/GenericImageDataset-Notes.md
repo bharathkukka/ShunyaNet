@@ -60,26 +60,6 @@ Each class folder contains images (JPG format).
 
 ---
 
-## Example Usage
-```python
-from torch.utils.data import DataLoader
-from 3-DatasetPreProcessing import GenericImageDataset
-
-# Training set (with augmentation)
-train_dataset = GenericImageDataset(root_dir, split='train', target_size=(96, 96), augment=True)
-train_loader = DataLoader(train_dataset, batch_size=32, shuffle=True)
-
-# Validation set (no augmentation)
-val_dataset = GenericImageDataset(root_dir, split='val', target_size=(96, 96), augment=False)
-val_loader = DataLoader(val_dataset, batch_size=32)
-
-# Test set (no augmentation)
-test_dataset = GenericImageDataset(root_dir, split='test', target_size=(96, 96), augment=False)
-test_loader = DataLoader(test_dataset, batch_size=32)
-```
-
----
-
 ## Best Practices
 - **Augmentation:** Only use augmentation for training data, not for validation or test sets.
 - **Image Format:** If your images are not JPG, update the file extension check in the code.
@@ -99,12 +79,6 @@ test_loader = DataLoader(test_dataset, batch_size=32)
 ## Error Handling
 - Skips non-directory files in the split folder.
 - For robustness, you can add try/except in `__getitem__` to handle unreadable images.
-
----
-
-## Integration
-- Use this class in your training, validation, and test scripts for any image classification project.
-- Works seamlessly with PyTorch's DataLoader and training loops.
 
 ---
 

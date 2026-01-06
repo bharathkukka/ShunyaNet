@@ -1,21 +1,20 @@
 """
-IMPORTANT NOTE ABOUT TEST DATA:
-================================
-The test folder contains unlabeled images (Kaggle competition format).
-This means:
-- Test images are NOT organized by disease folders
-- No ground truth labels available for evaluation
-- Cannot calculate accuracy/metrics on test set
-- Test set is only for generating predictions for submission
+NOTE ABOUT TEST DATA (KAGGLE FORMAT):
+------------------------------------
+Test folder images do not have labels.
+So:
+- They are not grouped into disease folders
+- I don't have correct answers (ground truth)
+- I cannot calculate accuracy, F1, confusion matrix, or any metrics
+- This folder is only useful to generate predictions and upload to Kaggle for scoring later
 
-SOLUTION:
-=========
-We use the train/val split for model development:
-- Train set: For training the model
-- Validation set: For hyperparameter tuning and model selection
-- Test set: For generating final predictions (no evaluation possible)
-
-If you need a labeled evaluation set, use the validation set!
+WHAT I WILL DO INSTEAD:
+----------------------
+I will use train + validation folders for model building.
+Meaning:
+- Train folder → model learns from this
+- Validation folder → I test model here and tune parameters
+- Test folder → ignore for now, only used when submitting predictions to Kaggle
 """
 
 import os
@@ -26,14 +25,8 @@ from pathlib import Path
 
 def count_images_in_directory(directory_path, extensions=None):
     """
-    Count all image files in a directory (including subdirectories)
-
-    Args:
-        directory_path: Path to the directory
-        extensions: List of valid image extensions (default: common image formats)
-
-    Returns:
-        int: Total count of image files
+    This function counts image files inside a folder and all its subfolders.
+    If I don't give extensions, it will assume common image formats automatically.
     """
     if extensions is None:
         extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.webp'}
@@ -48,14 +41,8 @@ def count_images_in_directory(directory_path, extensions=None):
 
 def count_images_by_class(directory_path, extensions=None):
     """
-    Count images in each subdirectory (class) of a directory
-
-    Args:
-        directory_path: Path to the directory containing class subdirectories
-        extensions: List of valid image extensions
-
-    Returns:
-        dict: Dictionary with class names as keys and image counts as values
+    This function checks each subfolder inside the given directory and counts images in them.
+    I will use this to know how many images belong to each disease/class folder.
     """
     if extensions is None:
         extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.webp'}
@@ -65,7 +52,6 @@ def count_images_by_class(directory_path, extensions=None):
     if not os.path.exists(directory_path):
         return class_counts
 
-    # Get all subdirectories
     for item in os.listdir(directory_path):
         item_path = os.path.join(directory_path, item)
         if os.path.isdir(item_path) and not item.startswith('.'):
@@ -80,12 +66,11 @@ def count_images_by_class(directory_path, extensions=None):
 
 def create_validation_split(dataset_root, val_split=0.1, seed=42):
     """
-    Create a validation set by moving val_split percentage of training data
+    This function will take 10% (default) of images from each disease folder in train
+    and move them into a new 'val' folder, so I can evaluate my model while training.
 
-    Args:
-        dataset_root: Root directory of the dataset
-        val_split: Percentage of training data to use for validation (default: 0.1 = 10%)
-        seed: Random seed for reproducibility
+    Why?
+    → Because test data is unlabeled, so validation folder becomes my real test for accuracy.
     """
     random.seed(seed)
 
@@ -93,133 +78,80 @@ def create_validation_split(dataset_root, val_split=0.1, seed=42):
     val_path = os.path.join(dataset_root, 'val')
 
     if not os.path.exists(train_path):
-        print("Error: Training directory not found!")
+        print("Train folder missing. I cannot split without it.")
         return
 
-    # Check if validation directory already exists
     if os.path.exists(val_path):
-        response = input(f"\nValidation directory already exists at: {val_path}\nDo you want to recreate it? (yes/no): ")
+        response = input("\nValidation folder already exists. Do I want to delete and make it again? (yes/no): ")
         if response.lower() not in ['yes', 'y']:
-            print("Operation cancelled.")
+            print("I chose not to recreate. Keeping the existing validation folder.")
             return
         else:
-            print(f"Removing existing validation directory...")
+            print("Deleting old validation folder to create a fresh split...")
             shutil.rmtree(val_path)
 
-    print("\n" + "=" * 70)
-    print("CREATING VALIDATION SET")
-    print("=" * 70)
-    print(f"Validation split: {val_split * 100}%\n")
-
-    # Create validation directory
-    os.makedirs(val_path, exist_ok=True)
+    print("\nStarting validation split process...\n")
 
     total_moved = 0
 
-    # Process each class directory
     for class_name in os.listdir(train_path):
         class_train_path = os.path.join(train_path, class_name)
 
         if not os.path.isdir(class_train_path) or class_name.startswith('.'):
             continue
 
-        # Create corresponding class directory in validation set
         class_val_path = os.path.join(val_path, class_name)
         os.makedirs(class_val_path, exist_ok=True)
 
-        # Get all image files in this class
         image_files = [f for f in os.listdir(class_train_path)
                       if Path(f).suffix.lower() in {'.jpg', '.jpeg', '.png', '.bmp', '.gif', '.tiff', '.webp'}]
 
-        # Calculate number of images to move to validation
         num_val = max(1, int(len(image_files) * val_split))
 
-        # Randomly select images for validation
         val_images = random.sample(image_files, num_val)
 
-        # Move selected images to validation directory
         for img_file in val_images:
             src = os.path.join(class_train_path, img_file)
             dst = os.path.join(class_val_path, img_file)
             shutil.move(src, dst)
 
         total_moved += num_val
-        print(f"  {class_name:<30} : {len(image_files):>4} -> Train: {len(image_files) - num_val:>4}, Val: {num_val:>4}")
+        print(f"{class_name} → moved {num_val} images to validation")
 
-    print(f"\n  Total images moved to validation: {total_moved}")
-    print("=" * 70)
-    print("Validation set created successfully!\n")
+    print(f"\nTotal images shifted into validation folder: {total_moved}\n")
 
 
 def verify_csv_labels(dataset_root):
     """
-    Verify that the CSV labels file exists and matches the dataset structure
-
-    NOTE: CSV files are NOT needed for model development!
-    Since train/val data is organized in folders, PyTorch's ImageFolder
-    can read labels directly from folder names.
-
-    This function is just for informational purposes.
-
-    Args:
-        dataset_root: Root directory of the dataset
-
-    Returns:
-        bool: True if CSV exists and can be used
+    This function only checks if a train.csv file exists.
+    But I don't actually need CSV for training because my images are already inside labeled folders.
+    This check is just to confirm Kaggle provided CSV or not.
     """
-    csv_path = os.path.join(Path(dataset_root).parent, 'train.csv')
+    csv_path = Path(dataset_root).parent.parent / 'train.csv'
 
     if not os.path.exists(csv_path):
-        print("\n" + "=" * 70)
-        print("CSV LABEL FILE")
-        print("=" * 70)
-        print("CSV file not found (train.csv)")
-        print("\n✓ This is OK! CSV is NOT needed for model development.")
-        print("✓ Labels are already in folder structure.")
-        print("✓ Use PyTorch's ImageFolder to load data.")
-        print("=" * 70)
+        print("\nNo CSV file found. That's fine because folder names already act as labels.")
         return False
 
     try:
         import pandas as pd
         df = pd.read_csv(csv_path)
 
-        print("\n" + "=" * 70)
-        print("CSV LABEL FILE (INFORMATIONAL ONLY)")
-        print("=" * 70)
-        print(f"CSV File: {csv_path}")
-        print(f"Total labeled images: {len(df)}")
-        print(f"\nLabel distribution:")
-        label_counts = df['label'].value_counts()
-        for label, count in label_counts.items():
-            print(f"  {label:<30} : {count:>6} images")
-
-        print("\n⚠️  NOTE: You DON'T need this CSV for model development!")
-        print("   Your data is organized in folders → Use ImageFolder")
-        print("=" * 70)
+        print("\nCSV exists, but I will NOT use it for training.")
+        print("Because PyTorch ImageFolder can read folder names as labels directly.")
 
         return True
-    except ImportError:
-        print("\n[INFO] pandas not installed (but you don't need it anyway!)")
-        print("       CSV files are not needed for model development.")
-        return False
-    except Exception as e:
-        print(f"\n[INFO] Could not read CSV file: {e}")
-        print("       (But CSV is not needed for model development anyway!)")
+    except:
+        print("\nCSV file is there, but I don't need it for model development.")
         return False
 
 
 def analyze_dataset(dataset_root):
     """
-    Analyze the complete dataset structure and count all images
-
-    Args:
-        dataset_root: Root directory of the dataset
+    This function prints image count details for train, val, and test folders.
+    This helps me confirm dataset structure before training the model.
     """
-    print("=" * 70)
-    print("PADDY DISEASE DATASET ANALYSIS")
-    print("=" * 70)
-    print(f"\nDataset Location: {dataset_root}\n")
+    print("\nChecking dataset structure and image counts...\n")
 
     train_path = os.path.join(dataset_root, 'train')
     val_path = os.path.join(dataset_root, 'val')
@@ -227,131 +159,58 @@ def analyze_dataset(dataset_root):
 
     total_images = 0
 
-    # Analyze training set
     if os.path.exists(train_path):
-        print("-" * 70)
-        print("TRAINING SET")
-        print("-" * 70)
         train_class_counts = count_images_by_class(train_path)
-
-        if train_class_counts:
-            for class_name, count in sorted(train_class_counts.items()):
-                print(f"  {class_name:<30} : {count:>6} images")
-
-            train_total = sum(train_class_counts.values())
-            print(f"\n  {'Total Training Images':<30} : {train_total:>6}")
-            total_images += train_total
-        else:
-            print("  No training data found!")
+        train_total = sum(train_class_counts.values())
+        print(f"Total images in train folder: {train_total}")
+        total_images += train_total
     else:
-        print("\nTraining directory not found!")
+        print("Train folder not found!")
 
-    # Analyze validation set
     if os.path.exists(val_path):
-        print("\n" + "-" * 70)
-        print("VALIDATION SET")
-        print("-" * 70)
         val_class_counts = count_images_by_class(val_path)
-
-        if val_class_counts:
-            for class_name, count in sorted(val_class_counts.items()):
-                print(f"  {class_name:<30} : {count:>6} images")
-
-            val_total = sum(val_class_counts.values())
-            print(f"\n  {'Total Validation Images':<30} : {val_total:>6}")
-            total_images += val_total
-        else:
-            print("  No validation data found!")
+        val_total = sum(val_class_counts.values())
+        print(f"Total images in validation folder: {val_total}")
+        total_images += val_total
     else:
-        print("\nValidation directory not found!")
+        print("Validation folder not found!")
 
-    # Analyze test set
     if os.path.exists(test_path):
-        print("\n" + "-" * 70)
-        print("TEST SET (UNLABELED)")
-        print("-" * 70)
         test_total = count_images_in_directory(test_path)
-        print(f"  {'Total Test Images':<30} : {test_total:>6}")
-        print("\n  ⚠️  WARNING: Test images are UNLABELED (Kaggle competition format)")
-        print("      - Cannot evaluate model performance on test set")
-        print("      - Test set is for generating predictions only")
-        print("      - Use VALIDATION set for model evaluation!")
+        print(f"Total images in test folder (unlabeled): {test_total}")
         total_images += test_total
     else:
-        print("\nTest directory not found!")
+        print("Test folder not found!")
 
-    # Summary
-    print("\n" + "=" * 70)
-    print("DATASET SUMMARY")
-    print("=" * 70)
-    if os.path.exists(train_path):
-        train_total = sum(count_images_by_class(train_path).values())
-        print(f"  Training Images    : {train_total:>6}")
-    if os.path.exists(val_path):
-        val_total = sum(count_images_by_class(val_path).values())
-        print(f"  Validation Images  : {val_total:>6}")
-    if os.path.exists(test_path):
-        test_total = count_images_in_directory(test_path)
-        print(f"  Test Images        : {test_total:>6}")
-    print(f"  {'TOTAL IMAGES':<20}: {total_images:>6}")
-    print("=" * 70)
+    print(f"\nOverall total image files in dataset: {total_images}\n")
 
 
 if __name__ == "__main__":
-    # Dataset root path (relative to current file)
+    """
+    This block decides if validation folder needs to be created.
+    Then it runs dataset analysis and prints workflow reminders for myself.
+    """
+
     current_dir = Path(__file__).parent
     dataset_root = current_dir.parent.parent / "Data" / "PaddyDiseases" / "Dataset"
 
-    # Convert to string for compatibility
     dataset_root = str(dataset_root)
 
-    # Check if validation directory exists
     val_path = os.path.join(dataset_root, 'val')
 
     if not os.path.exists(val_path):
-        print("Validation directory not found. Creating validation set with 10% of training data...\n")
+        print("Validation folder missing → creating a 80/10/10 split from train data...\n")
         create_validation_split(dataset_root, val_split=0.1)
     else:
-        print("Validation directory already exists.\n")
+        print("Validation folder already present. No need to create again.\n")
 
-    # Analyze the dataset
     analyze_dataset(dataset_root)
 
-    # Verify CSV labels
     verify_csv_labels(dataset_root)
 
-    # Print recommendations
-    print("\n" + "=" * 70)
-    print("WORKFLOW FOR MODEL DEVELOPMENT")
-    print("=" * 70)
-    print("\n📚 PHASE 1: MODEL DEVELOPMENT (Use Train + Val)")
-    print("-" * 70)
-    print("  ✓ TRAIN set     → Train your model")
-    print("  ✓ VALIDATION set → Evaluate & tune your model")
-    print("                    - Calculate accuracy, F1-score, confusion matrix")
-    print("                    - Select best model based on val performance")
-    print("                    - THIS IS YOUR EVALUATION METRIC!")
-    print()
-    print("🔮 PHASE 2: FINAL PREDICTIONS (Use Test)")
-    print("-" * 70)
-    print("  ✓ TEST set      → Generate predictions (blind predictions!)")
-    print("                    - You WON'T know if predictions are correct")
-    print("                    - Submit to Kaggle for scoring")
-    print("                    - Kaggle will tell you the accuracy")
-    print()
-    print("💡 SUMMARY:")
-    print("-" * 70)
-    print("  • During development: Test data is USELESS (no labels)")
-    print("  • For final submission: Test data is ESSENTIAL (Kaggle scoring)")
-    print("  • Your reported accuracy: Use VALIDATION accuracy")
-    print()
-    print("📁 WHAT YOU NEED:")
-    print("-" * 70)
-    print("  ✓ Train folder (organized by disease) - YES")
-    print("  ✓ Val folder (organized by disease)   - YES")
-    print("  ✗ Test folder (for now)               - NO (ignore it)")
-    print("  ✗ CSV files (train.csv)               - NO (not needed!)")
-    print()
-    print("  → Use PyTorch's ImageFolder - it reads labels from folder names!")
-    print("=" * 70)
-
+    print("\nMODEL BUILDING PLAN (MY OWN WORKFLOW):")
+    print("-------------------------------------")
+    print("1. Train model using images from train folder")
+    print("2. Check accuracy and tune model using validation folder")
+    print("3. Ignore test folder until I want to generate Kaggle submission predictions")
+    print("4. No need for CSV files while training because labels come from folder names")

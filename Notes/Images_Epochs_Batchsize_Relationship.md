@@ -69,5 +69,4 @@ References (practical rules)
 - Iterations per epoch = ceil(N / B) (unless last batch dropped).
 - Total updates = iterations_per_epoch * epochs.
 - Linear learning-rate scaling: LR proportional to B (empirical rule; validate on your task).
-
-End of note.
+- Early stopping based on validation performance to avoid overfitting with high E.

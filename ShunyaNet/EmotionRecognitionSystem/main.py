@@ -74,13 +74,13 @@ class Config:
 os.makedirs(Config.checkpoint_dir, exist_ok=True)
 os.makedirs(Config.results_dir, exist_ok=True)
 
-# 1. Data augmentation for training set
-train_transform = transforms.Compose([
-    transforms.RandomHorizontalFlip(),
-    transforms.RandomRotation(10),
-    transforms.ToTensor()
-])
-val_transform = transforms.ToTensor()
+# # 1. Data augmentation for training set
+# train_transform = transforms.Compose([
+#     transforms.RandomHorizontalFlip(),
+#     transforms.RandomRotation(10),
+#     transforms.ToTensor()
+# ])
+# val_transform = transforms.ToTensor()
 
 # Load datasets
 def load_data():
@@ -90,7 +90,7 @@ def load_data():
         split='train',
         target_size=Config.target_size,
         augment=True,
-        transform=train_transform  # Add data augmentation
+        # transform=train_transform  # Add data augmentation
     )
 
     val_dataset = GenericImageDataset(
@@ -98,7 +98,7 @@ def load_data():
         split='val',
         target_size=Config.target_size,
         augment=False,
-        transform=val_transform
+        # transform=val_transform
     )
 
     test_dataset = GenericImageDataset(
@@ -147,15 +147,6 @@ def load_data():
 
     return train_loader, val_loader, test_loader, class_names
 
-# 2. Compute class weights (example, replace with actual calculation)
-# import torch
-# import numpy as np
-# Suppose 'train_labels' is a list or numpy array of all training labels
-# class_sample_count = np.array([len(np.where(train_labels == t)[0]) for t in np.unique(train_labels)])
-# weight = 1. / class_sample_count
-# samples_weight = np.array([weight[t] for t in train_labels])
-# class_weights = torch.tensor(weight, dtype=torch.float).to(device)
-# For now, use placeholder:
 class_weights = torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], dtype=torch.float).to(device)
 
 # Model definition (increase complexity)

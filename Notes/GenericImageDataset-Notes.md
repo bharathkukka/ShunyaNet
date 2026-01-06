@@ -76,11 +76,6 @@ Each class folder contains images (JPG format).
 
 ---
 
-## Error Handling
-- Skips non-directory files in the split folder.
-- For robustness, you can add try/except in `__getitem__` to handle unreadable images.
-
----
 
 ## Summary
 The `GenericImageDataset` class is a powerful, reusable tool for loading and preprocessing image datasets for classification. It supports flexible splits, rich augmentations, and is easy to adapt for new datasets and tasks.

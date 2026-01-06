@@ -1,72 +1,107 @@
-Purpose
-- Quick reference explaining the relationship between number of images (N), epochs (E), batch size (B), and iterations (steps) per epoch (I).
+# 🧠 Model Training Notes (My Understanding)
 
-Key definitions and formulas
-- N = total number of training images (dataset size).
-- B = batch size (number of images processed together before a gradient update).
-- E = number of epochs (how many times the training loop sees the whole dataset).
-- I = iterations (batches) per epoch.
-  - If using a dataloader that does not drop the last incomplete batch: I = ceil(N / B).
-  - If drop_last=True: I = floor(N / B).
-- Total gradient updates (total steps) across training = I * E.
-- Total images presented to the model (counting repeats) = N * E (not reduced by B).
+## Dataset & Training Loop Basics
+- `N` → Total images in my training dataset  
+- `B` → Batch size = how many images go into the model at once before 1 gradient update  
+- `E` → Epochs = how many times the model sees all `N` images  
+- `I` → Iterations per epoch = number of batches in 1 epoch  
 
-Basic intuitions
-- Larger B -> fewer iterations I per epoch (because each iteration contains more samples).
-- Smaller B -> more iterations I per epoch.
-- Increasing E increases total exposures to data and total updates (proportional to E).
-- The product I * E determines how many weight updates occur (important for convergence).
+### How to calculate `I`
+- If I **use all images** (last small batch included):  
+  `I = ceil(N / B)`
+- If I **drop last batch** (`drop_last=True`):  
+  `I = floor(N / B)`
 
-What changes when you change one variable
-1) Change B (batch size) while keeping N and E fixed
-   - Increase B:
-     - I decreases (fewer updates per epoch).
-     - Each update uses more samples (less noisy gradient estimates).
-     - Requires more GPU memory and typically gives faster wall-clock throughput up to hardware limits.
-     - May require learning-rate adjustments (e.g., linear-scaling rule: LR_new = LR_old * (B_new / B_old)).
-     - Can reduce number of optimization steps for same number of epochs -> may affect convergence/generalization.
-   - Decrease B:
-     - I increases (more updates per epoch).
-     - More stochastic/noisy gradients which can help generalization but may harm stability.
-     - Lower memory footprint, but potentially slower throughput and higher communication overhead on distributed setups.
+### Key takeaways
+- Model weights update `I × E` times in full training  
+- Model sees `N × E` images (batch size does NOT reduce exposures)  
+- Larger `B` → `I` decreases, training is stable but needs more memory  
+- Smaller `B` → `I` increases, training is noisy but might generalize better  
+- More `E` → more learning but risk of overfitting  
+- Less `E` → model may underfit  
 
-2) Change E (number of epochs) while keeping N and B fixed
-   - Increase E:
-     - More exposures to data, more total updates -> better opportunity to converge.
-     - Higher risk of overfitting if training beyond the point where validation loss plateaus or increases.
-   - Decrease E:
-     - Fewer updates -> may underfit if too small.
+---
 
-Combined effects and common scenarios
-- Keep total steps constant (I * E fixed):
-  - If you increase B (I decreases) and increase E proportionally so that I*E is constant, total number of weight updates stays the same. However, each update's gradient variance changes (bigger batches = lower variance), so optimization dynamics and generalization can change even with same total steps.
-- Keep total epochs constant, change B:
-  - Changing B with fixed E changes total updates and can change convergence speed and generalization.
-- Increase both B and E:
-  - More updates (if E increased more than I decreased) and less noisy gradients per update; could converge faster but risk overfitting.
-- Decrease both B and E:
-  - Fewer updates and more noisy gradients; likely underfitting and slower convergence.
+## Optimization & Learning Behavior
+- **Gradient Update / Step** → 1 weight update using 1 batch  
+- **Learning Rate (LR)** → controls how big each update is  
+  - If `B` increases, LR might need scaling:  
+    `LR_new = LR_old × (B_new / B_old)`
+- **Loss Function** → tells the model how wrong its predictions are  
+  - ex: `CrossEntropyLoss` (classification), `MSE` (regression)
 
-Practical guidance
-- Monitor validation loss/accuracy; tune E until validation saturates or begins to degrade (early stopping recommended).
-- If GPU memory is the limit, start with the largest B that fits and adjust learning rate accordingly.
-- For small batch sizes (<32) expect noisier training; reduce LR or use adaptive optimizers.
-- For extremely large batch sizes, consider warmup schedules and scaled learning rates to avoid optimization issues.
-- If you want to keep the same number of optimization steps when changing B, adjust E so I*E remains approximately constant.
+- **Optimizer** → updates weights using gradients  
+  - ex: `SGD`, `Adam`, `RMSprop`
 
-Edge cases & notes
-- Data augmentation: the notion of "exposure" changes because each epoch presents transformed versions; total unique-image-like samples can be much larger than N.
-- If using class-imbalanced sampling or weighted samplers, N and I formulas still hold but effective per-class exposures differ.
-- Repeat/oversampling (to balance classes) increases effective N and thus I.
-- Deterministic behavior: if you drop the last batch, tiny changes to B can drop or add samples and slightly change training trajectories.
+- **Scheduler** → changes LR during training  
+  - ex: `ReduceLROnPlateau`, `CosineDecay`, `StepLR`
 
-Short checklist when changing B or E
-- If you increase batch size: test if current LR needs scaling; check GPU memory/time per epoch; watch validation for generalization change.
-- If you increase epochs: guard with early stopping and weight decay; watch for overfitting.
-- When tuning, change one variable at a time and keep a log of I and total steps (I*E).
+- **Convergence** → model stops improving much, training saturates  
+- **Overfitting** → training loss ↓ but validation loss ↑  
+- **Underfitting** → training loss is high, model didn’t learn enough  
 
-References (practical rules)
-- Iterations per epoch = ceil(N / B) (unless last batch dropped).
-- Total updates = iterations_per_epoch * epochs.
-- Linear learning-rate scaling: LR proportional to B (empirical rule; validate on your task).
-- Early stopping based on validation performance to avoid overfitting with high E.
+---
+
+## Regularization (to avoid overfitting)
+- **Weight Decay** → penalizes large weights (L2 regularization)
+- **Dropout** → randomly turns off neurons to avoid memorization
+- **Data Augmentation** → makes new variations of images every epoch  
+
+---
+
+## Model Performance Terms
+- **Validation Set** → data model sees *only for testing*, not training  
+- **Accuracy** → % of correct predictions  
+- **Precision / Recall / F1-score** → better metrics for imbalanced data  
+- **Confusion Matrix** → shows class-wise correct vs wrong predictions  
+
+---
+
+## Hardware & Training Speed Terms
+- **Throughput** → how many images processed per second
+- **VRAM** → GPU memory needed to fit batch size
+- **Mixed Precision Training** → uses float16 + float32 to train faster & use less memory  
+  - ex: `AMP (Automatic Mixed Precision)`
+
+- **Distributed Training** → training across multiple GPUs
+  - ex: `DataParallel`, `DDP`
+
+---
+
+## Dataset Loader Terms
+- **DataLoader / tf.data pipeline** → loads data in batches  
+- **Shuffle** → randomizes order of images each epoch  
+- **num_workers** → loads images faster using CPU threads  
+- **Prefetch** → prepares next batch while model trains current batch  
+- **Caching** → stores dataset in memory for faster epochs  
+
+---
+
+## Training Safety & Control
+- **Early Stopping** → stop training when validation stops improving  
+- **Warmup** → start LR small and increase slowly to avoid unstable jumps  
+- **Checkpoints** → save model weights at intervals  
+  - ex: `model.h5`, `ckpt`, `SavedModel`
+
+- **Inference** → using trained model to predict new images  
+- **Fine-tuning** → retrain last layers on my custom task  
+
+---
+
+## Final Understanding Summary
+| If I change | What happens |
+|-----------|-------------|
+| `B ↑` | `I ↓`, memory ↑, stable gradients, LR may ↑ |
+| `B ↓` | `I ↑`, memory ↓, noisy gradients, LR may ↓ |
+| `E ↑` | more updates, better learning, overfit risk |
+| `E ↓` | fewer updates, underfit risk |
+
+---
+
+## Notes 
+- Batch size only affects updates count, **not** total images seen  
+- Validation set guides me when to stop, training set guides weights  
+- Always log: `batch size`, `epochs`, `iterations`, `LR`, `loss`, `val_loss`
+
+---
+

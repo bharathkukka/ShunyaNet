@@ -56,10 +56,10 @@ A deep learning project to classify cotton leaf images into four disease categor
     weighted avg         0.51       0.49      0.48       176
     ```
   - **Confusion matrices:**
-    - ![Test Confusion Matrix](ShunyaNet/CottonDiseaseRecognition/Training/TrainingPhaseFinal-output/results/test_confusion_matrix.png)  
+    - ![Test Confusion Matrix](./Training/TrainingPhaseFinal-output/results/test_confusion_matrix.png)  
     
   - **Training curves:** (loss/accuracy)
-    - ![Training History](ShunyaNet/CottonDiseaseRecognition/Training/TrainingPhaseFinal-output/results/training_history.png)
+    - ![Training History](./Training/TrainingPhaseFinal-output/results/training_history.png)
 
 ---
 

@@ -39,7 +39,7 @@ A deep learning project to classify cotton leaf images into four disease categor
 | Input Size        | 224x224                      |
 
 ## 📊 Outputs & Results  
-  [Visit Here for detailed results and visualizations](ShunyaNet/CottonDiseaseRecognition/Training)
+ - [Visit Here for detailed results and visualizations](./Training)
 - **Results:**
   - **Test Accuracy:** 48.9%
   - **Test Loss:** 1.33

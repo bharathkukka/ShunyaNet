@@ -26,27 +26,43 @@ A deep learning project to classify cotton leaf images into four disease categor
    - Results (accuracy, confusion matrix, classification report) are saved and printed.
 
 ## ⚙️ Key Training Settings
-| Parameter         | Value/Setting                  |
-|-------------------|-------------------------------|
-| Batch Size        | 16                            |
-| Epochs            | 42                            |
-| Optimizer         | AdamW                         |
-| Learning Rate     | 0.001 (ReduceLROnPlateau)     |
-| Weight Decay      | 1e-5                          |
-| Early Stopping    | Patience 15 (on val_loss)     |
-| Augmentation      | Crop, flip, rotation, jitter  |
-| Regularization    | DropBlock, weight decay       |
-| Input Size        | 224x224                       |
+| Parameter         | Value/Setting                |
+|-------------------|------------------------------|
+| Batch Size        | 16                           |
+| Epochs            | 42                           |
+| Optimizer         | AdamW                        |
+| Learning Rate     | 0.0001 (ReduceLROnPlateau)   |
+| Weight Decay      | 1e-5                         |
+| Early Stopping    | Patience 35 (on val_loss)    |
+| Augmentation      | Crop, flip, rotation, jitter |
+| Regularization    | DropBlock, weight decay      |
+| Input Size        | 224x224                      |
 
-## 📊 Outputs & Results
-- **Checkpoints:** Saved in `output/checkpoints/` (best model, periodic checkpoints)
+## 📊 Outputs & Results  
+  [Visit Here for detailed results and visualizations](ShunyaNet/CottonDiseaseRecognition/Training)
 - **Results:**
-  - Confusion matrices (`output/results/`)
-  - Training curves (loss/accuracy)
-  - Classification report (precision, recall, F1)
-- **Visuals:**
-  - Data split and loader diagrams in `Data/`
-  - Training result screenshots in `Data/TrainResult/`
+  - **Test Accuracy:** 48.9%
+  - **Test Loss:** 1.33
+  - **Classification Report:**
+    ```
+    precision    recall  f1-score   support
+    bacterial_blight     0.38       0.50      0.43        46
+    curl_virus           0.55       0.28      0.37        43
+    fussarium_wilt       0.51       0.72      0.60        43
+    healthy              0.61       0.45      0.52        44
+
+    accuracy                                 0.49       176
+    macro avg            0.51       0.49      0.48       176
+    weighted avg         0.51       0.49      0.48       176
+    ```
+  - **Confusion matrices:**
+    - ![Test Confusion Matrix](ShunyaNet/CottonDiseaseRecognition/Training/TrainingPhaseFinal-output/results/test_confusion_matrix.png)  
+    
+  - **Training curves:** (loss/accuracy)
+    - ![Training History](ShunyaNet/CottonDiseaseRecognition/Training/TrainingPhaseFinal-output/results/training_history.png)
+
+---
+
 
 ### 📈 Evaluation Metrics & Loss
 | Metric                | Description                                      | Where to Find / How Computed                |

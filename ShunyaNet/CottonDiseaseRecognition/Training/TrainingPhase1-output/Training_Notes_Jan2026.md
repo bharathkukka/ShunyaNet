@@ -1,4 +1,4 @@
-# Cotton Disease Recognition Training: My Notes & Reflections (Jan 2026)
+# Cotton Disease Recognition Training: My Notes & Reflections 
 
 ## 1. What Happened (Initial Observations)
 - Training stopped early at epoch 15 (should have gone to 42) because of early stopping.

@@ -19,7 +19,9 @@ class DropBlock2D(nn.Module):
             return x
         gamma = self.drop_prob / (self.block_size ** 2)
         mask = (torch.rand(x.shape[0], 1, x.shape[2], x.shape[3], device=x.device) < gamma).float()
-        block_mask = F.max_pool2d(mask, self.block_size, stride=1, padding=self.block_size // 2)
+        # Ensure padding is an int or tuple, not a tensor
+        padding = self.block_size // 2 if isinstance(self.block_size, int) else tuple(b // 2 for b in self.block_size)
+        block_mask = F.max_pool2d(mask, self.block_size, stride=1, padding=padding)
         out = x * (1 - block_mask)
         scale = block_mask.numel() / (block_mask.sum() + 1e-6)  # avoid division by zero
         out = out * scale
@@ -324,3 +326,15 @@ class ShunyaNet(nn.Module):
         # Option 2: Attention pooling classifier
         out2 = self.attn_pool(x)
         return (out1 + out2) / 2  # Ensemble output
+#
+# if __name__ == "__main__":
+#     try:
+#         from torchinfo import summary
+#     except ImportError:
+#         print("Please install torchinfo: pip install torchinfo")
+#         summary = None
+#         exit(1)
+#     if summary is not None:
+#         # Example: summary for ShunyaNet with 8 emotion classes, input size 3x224x224
+#         model = ShunyaNet(num_classes=8)
+#         summary(model, input_size=(1, 3, 224, 224), col_names=["input_size", "output_size", "num_params", "params_percent"], depth=3)

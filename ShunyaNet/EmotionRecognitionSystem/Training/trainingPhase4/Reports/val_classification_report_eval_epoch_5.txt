@@ -1,0 +1,17 @@
+Val Loss: 4.5602, Val Accuracy: 0.1010
+
+Classification Report:
+              precision    recall  f1-score   support
+
+       anger     0.0000    0.0000    0.0000       321
+    contempt     0.1000    0.0035    0.0067       287
+     disgust     0.0953    0.5547    0.1627       247
+        fear     0.0000    0.0000    0.0000       317
+       happy     0.0000    0.0000    0.0000       504
+     neutral     0.0000    0.0000    0.0000       512
+         sad     0.1067    0.5016    0.1760       309
+    surprise     0.0000    0.0000    0.0000       403
+
+    accuracy                         0.1010      2900
+   macro avg     0.0378    0.1325    0.0432      2900
+weighted avg     0.0294    0.1010    0.0333      2900

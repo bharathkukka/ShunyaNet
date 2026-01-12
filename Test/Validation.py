@@ -399,7 +399,7 @@ def evaluate_all_checkpoints():
                 checkpoint_label=ckpt_label,
             )
             # If this is the checkpoint_epoch_25.pth, also run full test evaluation
-            if os.path.basename(ckpt_path) == 'checkpoint_epoch_25.pth':
+            if os.path.basename(ckpt_path) == 'checkpoint_epoch_45.pth':
                 print("\nRunning full test-set evaluation for checkpoint_epoch_25.pth...")
                 test_acc, _ = evaluate(model, test_loader, criterion, class_names, checkpoint_label=ckpt_label)
                 print(f"Test accuracy for {ckpt_label}: {test_acc:.4f}")

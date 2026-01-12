@@ -174,7 +174,12 @@ def load_model_from_checkpoint(checkpoint_path, device):
         if not os.path.exists(colab_script):
             raise ImportError(f"Could not find ShunyaNet architecture. Tried: ShunyaNet.EmotionRecognitionSystem.ShunyaNetArchitecture and {colab_script}")
         
-        from colab_emotion_classifier_combined import ShunyaNet
+        # Use importlib for safer dynamic import
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("colab_combined", colab_script)
+        colab_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(colab_module)
+        ShunyaNet = colab_module.ShunyaNet
         
         model = ShunyaNet(num_classes=num_classes).to(device)
         model.load_state_dict(checkpoint['model_state_dict'])

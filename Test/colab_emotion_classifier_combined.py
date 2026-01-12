@@ -403,7 +403,7 @@ class Config:
     weight_decay = 1e-5
     dropblock_prob = 0.1
     dropblock_size = 5
-    checkpoint_dir = './checkpoints'
+    checkpoint_dir = '../ShunyaNet/EmotionRecognitionSystem/Training/TrainingPhase2/checkpoints'
     results_dir = './results'
 
 os.makedirs(Config.checkpoint_dir, exist_ok=True)

@@ -21,7 +21,7 @@ ShunyaNet = importlib.import_module("ShunyaNet.PaddyDiseaseRecognition.ShunyaNet
 GenericImageDataset = importlib.import_module("ShunyaNet.PaddyDiseaseRecognition.preprocessing").GenericImageDataset
 
 # Import custom layers for model loading
-from ShunyaNet.PaddyDiseaseRecognition.ShunyaNetTensorflow import Swish, DropBlock2D
+from ShunyaNet.PaddyDiseaseRecognition.Tensorflow.ShunyaNetTensorflow import Swish, DropBlock2D
 # Set GPU memory growth to avoid OOM errors
 gpus = tf.config.list_physical_devices('GPU')
 if gpus:
@@ -45,7 +45,7 @@ def set_seed(seed: int = 42):
 # Configuration
 class Config:
     # Dataset parameters
-    data_dir = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/PaddyDisease'
+    data_dir = '/Data/PaddyDisease'
     target_size = (224, 224)
 
     # Training parameters

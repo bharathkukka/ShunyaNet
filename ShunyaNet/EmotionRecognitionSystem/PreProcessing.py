@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 from torchvision import transforms
 
 class GenericImageDataset(Dataset):
-    def __init__(self, root_dir, split='train', target_size=(96, 96), augment=False):
+    def __init__(self, root_dir, split='train', target_size=(224, 224), augment=False):
         self.root_dir = os.path.join(root_dir, split)
         # Filter out hidden files/folders that start with a dot
         self.classes = sorted([d for d in os.listdir(self.root_dir)

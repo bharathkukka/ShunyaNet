@@ -1,0 +1,19 @@
+Val Loss: 2.2627, Val Accuracy: 0.2095
+
+Classification Report:
+                          precision    recall  f1-score   support
+
+   bacterial_leaf_blight     0.0000    0.0000    0.0000        47
+   bacterial_leaf_streak     0.0000    0.0000    0.0000        38
+bacterial_panicle_blight     0.0000    0.0000    0.0000        33
+                   blast     0.1940    0.8902    0.3185       173
+              brown_spot     0.0000    0.0000    0.0000        96
+              dead_heart     0.0000    0.0000    0.0000       144
+            downy_mildew     0.0000    0.0000    0.0000        62
+                   hispa     0.2258    0.0881    0.1267       159
+                  normal     0.0000    0.0000    0.0000       176
+                  tungro     0.2722    0.4537    0.3403       108
+
+                accuracy                         0.2095      1036
+               macro avg     0.0692    0.1432    0.0785      1036
+            weighted avg     0.0954    0.2095    0.1081      1036

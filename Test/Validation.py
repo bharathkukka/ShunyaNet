@@ -64,14 +64,14 @@ def set_seed(seed: int = 42):
 # Configuration
 class Config:
     # Dataset parameters
-    data_dir = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/Emotions'
-    target_size = (96, 96)
+    data_dir = '/Users/bharathgoud/PycharmProjects/Shunya-00/Data/PaddyDisease'
+    target_size = (224, 224)
 
     # Training parameters
-    num_classes = 8  # default/reference; model will derive from dataset at runtime
+    num_classes = 10  # default/reference; model will derive from dataset at runtime
     batch_size = 16
     num_epochs = 52
-    learning_rate = 0.0005  # Lower initial learning rate
+    learning_rate = 0.001  # Lower initial learning rate
     weight_decay = 1e-5
     seed = 42
     # Early stopping
@@ -165,8 +165,6 @@ def load_data():
     print(f"Classes: {class_names}")
 
     return train_loader, val_loader, test_loader, class_names
-
-class_weights = torch.tensor([1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0], dtype=torch.float).to(device)
 
 # Model definition (increase complexity)
 class ImprovedModel(nn.Module):
@@ -316,25 +314,21 @@ def evaluate_split(model, data_loader, criterion, class_names, split_name="test"
 
 
 def load_model_from_checkpoint(checkpoint_path, class_names):
-    """Reload a ShunyaNet model from a checkpoint.
-
-    Supports two formats:
-    1) Full checkpoint dict with 'model_state_dict' and optional metadata.
-    2) Raw state_dict saved directly as model.state_dict().
-    """
+    """Reload a ShunyaNet model from a checkpoint using the checkpoint filename as label."""
     print(f"Loading checkpoint from: {checkpoint_path}")
     checkpoint = torch.load(checkpoint_path, map_location=device)
+
+    # Always use the base filename (no extension) as the label to match checkpoint naming
+    ckpt_label = os.path.splitext(os.path.basename(checkpoint_path))[0]
 
     # Determine whether this is a full checkpoint or a raw state_dict
     if isinstance(checkpoint, dict) and 'model_state_dict' in checkpoint:
         state_dict = checkpoint['model_state_dict']
-        ckpt_label = f"epoch_{checkpoint.get('epoch', 'unknown')}"
         saved_class_names = checkpoint.get('class_names')
         if saved_class_names is not None:
             class_names = saved_class_names
     else:
         state_dict = checkpoint
-        ckpt_label = os.path.splitext(os.path.basename(checkpoint_path))[0]
 
     num_classes = len(class_names)
     model = ShunyaNet(
@@ -369,7 +363,8 @@ def evaluate_all_checkpoints():
 
     # Load data once
     train_loader, val_loader, test_loader, class_names = load_data()
-    criterion = nn.CrossEntropyLoss(weight=class_weights)
+    # Use unweighted loss to avoid class-size mismatch
+    criterion = nn.CrossEntropyLoss()
 
     # Evaluate each checkpoint on validation set
     for idx, fname in enumerate(all_files):
@@ -379,11 +374,7 @@ def evaluate_all_checkpoints():
 
         model, class_names, ckpt_label = load_model_from_checkpoint(ckpt_path, class_names)
 
-        # Create per-checkpoint subfolder
-        ckpt_out_dir = os.path.join(eval_root, ckpt_label)
-        os.makedirs(ckpt_out_dir, exist_ok=True)
-
-        # Temporarily redirect Config.results_dir for this checkpoint's artifacts
+        # Create per-checkpoint subfolder and redirect artifacts there
         original_results_dir = Config.results_dir
         ckpt_out_dir = os.path.join(eval_root, ckpt_label)
         Config.results_dir = ckpt_out_dir
@@ -398,9 +389,10 @@ def evaluate_all_checkpoints():
                 split_name="val",
                 checkpoint_label=ckpt_label,
             )
-            # If this is the checkpoint_epoch_25.pth, also run full test evaluation
-            if os.path.basename(ckpt_path) == 'checkpoint_epoch_45.pth':
-                print("\nRunning full test-set evaluation for checkpoint_epoch_25.pth...")
+
+            # Run full test-set evaluation only for checkpoint_epoch_25.pth
+            if os.path.basename(ckpt_path) == 'checkpoint_epoch_5.pth':
+                print("\nRunning full test-set evaluation for checkpoint_epoch_5.pth...")
                 test_acc, _ = evaluate(model, test_loader, criterion, class_names, checkpoint_label=ckpt_label)
                 print(f"Test accuracy for {ckpt_label}: {test_acc:.4f}")
         finally:

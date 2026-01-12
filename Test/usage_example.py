@@ -100,9 +100,11 @@ print("        augment=True")
 print("    )")
 print()
 
-# Example 6: Show available transforms
-print("6. Available Data Augmentations")
+# Example 6: Show available transforms (for documentation)
+print("6. Available Data Augmentations (used by EmotionDataset)")
 print("-" * 70)
+print("Note: These are string representations for documentation.")
+print("Actual transforms are applied automatically by EmotionDataset.\n")
 
 transforms_list = [
     "transforms.Resize(target_size)",

@@ -103,22 +103,24 @@ test("Validation.py import", test_validation_import)
 
 print()
 
+# Add ShunyaNet parent directory to path once (used by multiple tests)
+_shunyanet_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ShunyaNet'))
+if _shunyanet_path not in sys.path:
+    sys.path.insert(0, _shunyanet_path)
+
 # Test 3: Import ShunyaNet architectures
 print("Testing ShunyaNet Architecture Imports...")
 print("-" * 70)
 
 def test_emotion_architecture():
-    sys.path.insert(0, os.path.abspath('../ShunyaNet'))
     from EmotionRecognitionSystem.ShunyaNetArchitecture import ShunyaNet
     assert ShunyaNet, "EmotionRecognitionSystem ShunyaNet exists"
 
 def test_cotton_architecture():
-    sys.path.insert(0, os.path.abspath('../ShunyaNet'))
     from CottonDiseaseRecognition.ShunyaNetArch import ShunyaNet
     assert ShunyaNet, "CottonDiseaseRecognition ShunyaNet exists"
 
 def test_paddy_architecture():
-    sys.path.insert(0, os.path.abspath('../ShunyaNet'))
     from PaddyDiseaseRecognition.ShunyaNetTensorflow import ShunyaNet
     assert ShunyaNet, "PaddyDiseaseRecognition ShunyaNet exists"
 
@@ -134,7 +136,6 @@ print("-" * 70)
 
 def test_pytorch_model():
     import torch
-    sys.path.insert(0, os.path.abspath('../ShunyaNet'))
     from EmotionRecognitionSystem.ShunyaNetArchitecture import ShunyaNet
     model = ShunyaNet(num_classes=8)
     assert model, "PyTorch ShunyaNet can be instantiated"
@@ -145,7 +146,6 @@ def test_pytorch_model():
 
 def test_tensorflow_model():
     import tensorflow as tf
-    sys.path.insert(0, os.path.abspath('../ShunyaNet'))
     from PaddyDiseaseRecognition.ShunyaNetTensorflow import ShunyaNet
     # TensorFlow version doesn't take input_shape in __init__
     model = ShunyaNet(num_classes=10)

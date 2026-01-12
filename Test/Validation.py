@@ -148,7 +148,12 @@ def load_model_from_checkpoint(checkpoint_path, device):
     # Note: This assumes the architecture file is available
     # You may need to adjust the import based on your project structure
     try:
-        sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+        # Add parent directory to path (works from any location)
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+        parent_dir = os.path.abspath(os.path.join(script_dir, '..'))
+        if parent_dir not in sys.path:
+            sys.path.insert(0, parent_dir)
+        
         from ShunyaNet.EmotionRecognitionSystem.ShunyaNetArchitecture import ShunyaNet
         
         model = ShunyaNet(num_classes=num_classes).to(device)
@@ -165,6 +170,10 @@ def load_model_from_checkpoint(checkpoint_path, device):
         print("Attempting to load with colab_emotion_classifier_combined ShunyaNet...")
         
         # Fallback: try to use the ShunyaNet from colab_emotion_classifier_combined
+        colab_script = os.path.join(script_dir, 'colab_emotion_classifier_combined.py')
+        if not os.path.exists(colab_script):
+            raise ImportError(f"Could not find ShunyaNet architecture. Tried: ShunyaNet.EmotionRecognitionSystem.ShunyaNetArchitecture and {colab_script}")
+        
         from colab_emotion_classifier_combined import ShunyaNet
         
         model = ShunyaNet(num_classes=num_classes).to(device)

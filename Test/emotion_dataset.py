@@ -21,10 +21,11 @@ class EmotionDataset(Dataset):
         self.classes = sorted([d for d in os.listdir(self.root_dir)
                               if not d.startswith('.') and os.path.isdir(os.path.join(self.root_dir, d))])
         self.samples = []
+        valid_extensions = ('.jpg', '.jpeg', '.png', '.bmp')
         for label, class_name in enumerate(self.classes):
             class_dir = os.path.join(self.root_dir, class_name)
             for fname in os.listdir(class_dir):
-                if fname.lower().endswith('.jpg') and not fname.startswith('.'):
+                if fname.lower().endswith(valid_extensions) and not fname.startswith('.'):
                     self.samples.append((os.path.join(class_dir, fname), label))
         self.transform = self._build_transform(target_size, augment)
 

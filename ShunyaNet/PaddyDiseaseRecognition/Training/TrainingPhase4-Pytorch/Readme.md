@@ -10,9 +10,6 @@ Phase 4 continues training with the PyTorch implementation of ShunyaNet on the p
 
 ## Outputs (Where to find)
 - Checkpoint: [checkpoints/checkpoint_epoch_10.pth](./checkpoints/checkpoint_epoch_10.pth)
-- Confusion Matrices (Test): `./ConfusionMatrix/`
-  - `confusion_matrix_epoch_1.png`
-  - `confusion_matrix_epoch_12.png`
 - Test Report (Epoch 10): `./test_classification_report_checkpoint_epoch_10.txt`
 
 ---

@@ -42,11 +42,11 @@ weighted avg     0.1471    0.2091    0.1134      2913
 
 
 **Confusion Matrix**  
-![Confusion Matrix](ShunyaNet/EmotionRecognitionSystem/Training/TrainingPhase1/results/test_confusion_matrix.png)
+![Confusion Matrix](results/test_confusion_matrix.png)
 
 
 **Training History**  
-![Training History](ShunyaNet/EmotionRecognitionSystem/Training/TrainingPhase1/results/training_history.png)
+![Training History](results/training_history.png)
 
 ## Observations
 This phase was a bit disappointing in terms of raw numbers. The model only managed about 21% accuracy on the test set, which is not much better than random guessing (given 8 classes). Most classes like 'anger', 'contempt', 'disgust', 'fear', and 'sad' had zero precision and recall, meaning the model never predicted them correctly. Only 'neutral' and 'surprise' had reasonable recall, but even there, precision was low.

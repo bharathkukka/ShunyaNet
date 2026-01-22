@@ -8,7 +8,7 @@ This document consolidates all training phases, key results, observations, and n
 Quick navigation (click to open phase summaries):
 - Phase 1 — TensorFlow port and baseline → [TrainingPhase1-Tensorflow/Readme.md](./TrainingPhase1-Tensorflow/Readme.md)
 - Phase 2 — PyTorch run (checkpoints/results) → [TrainingPhase2-Pytorch/](./TrainingPhase2-Pytorch/)
-- Phase 3 — PyTorch fast run (partial, power interruption) → [TrainingPhase3-Pytorch/Readme.md](./TrainingPhase3-Pytorch/Readme.md)
+- Phase 3 — PyTorch fast run (partial, power interruption) → [TrainingPhase3-Pytorch/Readme.md](ShunyaNet/PaddyDiseaseRecognition/Training/TrainingPhase3-Pytorch )
 - Phase 4 — PyTorch continued (test-per-epoch focus) → [TrainingPhase4-Pytorch/Readme.md](./TrainingPhase4-Pytorch/Readme.md)
 
 Summary of outcomes by phase

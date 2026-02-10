@@ -24,7 +24,7 @@ Phase 4 continues training with the PyTorch implementation of ShunyaNet on the p
 ---
 ## Test: Classification Report (Epoch 10)  
 
-<img src="TrainingPhase4-Pytorch/test_confusion_matrix_checkpoint_epoch_10.png" alt="Test Confusion Matrix — Epoch 12" width="780" />
+<img src="ShunyaNet/PaddyDiseaseRecognition/Training/TrainingPhase4-Pytorch/ConfusionMatrix/confusion_matrix_epoch_12.png" alt="Test Confusion Matrix — Epoch 12" width="780" />
 
 ```
 Test Loss: 2.2788, Test Accuracy: 0.1508

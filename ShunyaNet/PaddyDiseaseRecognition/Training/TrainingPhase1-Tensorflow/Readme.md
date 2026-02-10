@@ -32,7 +32,7 @@ First pass where ShunyaNet was ported to TensorFlow/Keras and trained on the pad
 - Checkpoints 
 [checkpoints](checkpoints)
 
-![Confusion Matrix Epoch1](ShunyaNet/PaddyDiseaseRecognition/Training/TrainingPhase1-Tensorflow/results/confusion_matrix_epoch_1.png)
+![Confusion Matrix Epoch1](TrainingPhase1-Tensorflow/results/confusion_matrix_epoch_1.png)
 
 > Note: Exact numbers (accuracy/loss) are not restated here to avoid mismatches; consult the artifacts in `output/results/` for the precise metrics from Phase 1.
 

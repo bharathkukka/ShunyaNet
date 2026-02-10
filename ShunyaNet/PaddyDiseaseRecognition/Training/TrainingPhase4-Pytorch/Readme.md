@@ -19,12 +19,12 @@ Phase 4 continues training with the PyTorch implementation of ShunyaNet on the p
 <img src="./ConfusionMatrix/confusion_matrix_epoch_1.png" alt="Test Confusion Matrix — Epoch 1" width="780" />
 
 ### Epoch 12 (Test)
-<img src="./ConfusionMatrix/confusion_matrix_epoch_12.png" alt="Test Confusion Matrix — Epoch 12" width="780" />
+<img src="https://github.com/bharathkukka/ShunyaNet/blob/0ee3838785b0bde87b9048177e349da4849343d7/ShunyaNet/PaddyDiseaseRecognition/Training/TrainingPhase4-Pytorch/ConfusionMatrix/confusion_matrix_epoch_12.png" alt="Test Confusion Matrix — Epoch 12" width="780" />
 
 ---
 ## Test: Classification Report (Epoch 10)  
 
-<img src="ShunyaNet/PaddyDiseaseRecognition/Training/TrainingPhase4-Pytorch/test_confusion_matrix_checkpoint_epoch_10.png" alt="Test Confusion Matrix — Epoch 12" width="780" />
+<img src="TrainingPhase4-Pytorch/test_confusion_matrix_checkpoint_epoch_10.png" alt="Test Confusion Matrix — Epoch 12" width="780" />
 
 ```
 Test Loss: 2.2788, Test Accuracy: 0.1508

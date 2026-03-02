@@ -1,6 +1,7 @@
 # Folder(s) you want to ignore
 
 /Data/
+/CNN - Learning/
 
 # Python virtual environment
 venv/

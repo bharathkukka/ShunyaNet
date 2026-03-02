@@ -5,7 +5,7 @@ This document summarizes all my training phases for the Cotton Disease Recogniti
 ---
 
 ## 📋 Training Phases Overview
-1. **[Final Phase — Windows Laptop (i7 12th Gen, 16GB RAM)](./TrainingPhaseFinal-output)**
+1. **[Final Phase — Windows (i7 12th Gen, 16GB RAM)](./TrainingPhaseFinal-output)**
    - *Final run with more aggressive early stopping and data augmentation*
    - **Epochs:** 42, **Batch size:** 16, **Early stopping:** 32 (stopped at epoch 35)
    - **Best Accuracy:** 48.9% (test)
@@ -15,7 +15,7 @@ This document summarizes all my training phases for the Cotton Disease Recogniti
      - ![Test](./TrainingPhaseFinal-output/results/test_confusion_matrix.png)
    - **Observation:** Data augmentation applied, but model still struggles to differentiate some classes. Training stopped early due to no improvement. Dataset quality and class separability are main bottlenecks now.
 
-2. **[Phase 1 — Windows Laptop (i7 12th Gen, 16GB RAM)](./TrainingPhase1-output)**
+2. **[Phase 1 — Windows  (i7 12th Gen, 16GB RAM)](./TrainingPhase1-output)**
    - *Moved to a more powerful Windows laptop*
    - **Epochs:** 42, **Batch size:** 16, **Early stopping:** 15
    - **Best Accuracy:** 38.1% (test)

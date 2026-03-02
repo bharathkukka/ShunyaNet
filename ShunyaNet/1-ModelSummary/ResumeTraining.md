@@ -1,6 +1,6 @@
 # Resuming CNN Training After an Interruption — My Notes
 
-TL;DR
+
 - Yes, I can resume training exactly where it stopped as long as I have a proper checkpoint.
 - I must restore: model weights + optimizer state + the epoch index (and scheduler/scaler if I used them).
 - Start from the correct next epoch (watch out for 0-indexing) so learning-rate schedules and logs continue properly.

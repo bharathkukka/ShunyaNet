@@ -15,9 +15,9 @@
 
 ---
 
-## Phase 1: Training on Windows Laptop (Intel i7 12th Gen, 16GB RAM)
+## Phase 1: Training on Windows (Intel i7 12th Gen, 16GB RAM)
 
-- Moved training to a Windows laptop (Intel i7 12th Gen CPU, 16GB RAM).
+- Moved training to a Windows (Intel i7 12th Gen CPU, 16GB RAM).
 - Updated parameters:
   - **Batch size:** 16
   - **Epochs:** 42

@@ -1,7 +1,0 @@
-ppe_system/
-├─ main.py                 # ties everything together (example single stream)
-├─ memryx_wrapper.py       # wrapper class to call MemryX Simulator / AsyncAccl
-├─ ring_buffer.py          # circular buffer storing recent frames + timestamps
-├─ ppe_logic.py            # logic to decide PPE compliance from detections
-├─ alerting.py             # sends webhook / email and persists metadata
-├─ config.py               # configuration variables
